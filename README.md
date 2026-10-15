@@ -10,6 +10,7 @@ puis **Installer**. Les mises à jour arrivent ensuite par le bouton habituel de
 
 | Module | Ce qu'il fait | Lien du manifeste |
 |---|---|---|
+| **Better CSB Sheets** | Habillage de toutes les fiches Custom System Builder, des fenêtres de jet et du chat, sans toucher aux templates : champs, onglets, tableaux et jauges lisibles, dés sous le total, détail des jets qui remonte les variables du message, clair / sombre, palettes Parchemin, Ardoise et Forêt. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/better-csb-sheets/module.json` |
 | **Better Timer** | Minuteurs et chronomètres partagés : affichage déplaçable pour les joueurs, widget pause / reprise / arrêt pour le MJ. Les comptes à rebours survivent à un rechargement. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/better-timer/module.json` |
 | **Jukebox Meyiv** | Musique YouTube partagée pilotée par le MJ : bibliothèque en dossiers colorés, ajout de liens par lot, son ciblé sur certains joueurs, widget pour tous. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/jukebox-meyiv/module.json` |
 | **Better Theater** | Portraits des personnages en ronde ovale autour de l'écran, sans bloquer les clics ; répliques du chat en bulles. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/better-theater/module.json` |
@@ -19,6 +20,10 @@ puis **Installer**. Les mises à jour arrivent ensuite par le bouton habituel de
 
 ## Bon à savoir
 
+- **Better CSB Sheets** ne s'utilise qu'avec le système Custom System Builder. Réglages : *Thème* (chaque joueur :
+  suivre Foundry, clair ou sombre) et *Palette* (toute la table). Les fiches de template (mode construction) gardent
+  l'apparence de CSB. Couleurs à soi : surcharger les variables `--bcs-l-*` (clair) et `--bcs-d-*` (sombre) sur
+  `body.bcs-on`, par exemple avec un module de CSS personnalisé.
 - **Quick Attack FX** demande [Sequencer](https://foundryvtt.com/packages/sequencer) et une bibliothèque JB2A
   (la version gratuite [JB2A_DnD5e](https://foundryvtt.com/packages/JB2A_DnD5e) suffit).
 - **APNG Cut-in**, animations sur résultat de jet : le module réagit à une balise invisible dans le message de jet,

@@ -1,0 +1,693 @@
+/* =====================================================================
+   Better CSB Sheets : habillage de toutes les fiches Custom System Builder, des fenêtres de jet et du chat,
+   sans rien demander aux templates (seulement les classes que CSB pose lui-même).
+   Tout est derrière body.bcs-on, posée par scripts/main.js : module coupé (Character Sheet Meyiv actif) = rien ne s'applique.
+   Les fiches de template (mode construction) ne sont pas habillées : l'éditeur de CSB reste tel quel.
+   ===================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
+
+/* ---------------------------------------------------------------- palettes
+   Chaque palette donne ses couleurs claires (--bcs-l-*) et sombres (--bcs-d-*) ; la section « modes » plus bas
+   choisit l'une ou l'autre selon le réglage Thème. Pour une couleur à soi : surcharger ces variables sur body.bcs-on. */
+body.bcs-on {
+  --bcs-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
+  --bcs-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
+
+  /* Parchemin (par défaut) : vélin et bordeaux le jour, bleu nuit et or la nuit */
+  --bcs-l-bg: #f6f1e6;  --bcs-l-bg2: #f1eadb;  --bcs-l-win: #ebe5d8;  --bcs-l-head: #e3dac6;
+  --bcs-l-field: #fffaf0;  --bcs-l-solid: #fff;  --bcs-l-chip: #efe6d4;  --bcs-l-track: #e5dccb;
+  --bcs-l-ink: #2a221d;  --bcs-l-soft: #6b5d52;  --bcs-l-rule: #cdbfa6;
+  --bcs-l-accent: #7d1f24;  --bcs-l-accent2: #5c1519;  --bcs-l-btn: #7d1f24;  --bcs-l-btn-hover: #5c1519;  --bcs-l-btn-ink: #fff;
+  --bcs-l-gilt: #a8823a;  --bcs-l-red: #c0262d;  --bcs-l-green: #3f7d3a;  --bcs-l-blue: #1f5fd1;  --bcs-l-orange: #d9730d;
+  --bcs-l-chat: #f8f4ea;  --bcs-l-shadow: rgba(42, 34, 29, .45);
+
+  --bcs-d-bg: #141b2d;  --bcs-d-bg2: #10162a;  --bcs-d-win: radial-gradient(120% 80% at 50% 0%, #121a30, #070b16);  --bcs-d-head: #05080f;
+  --bcs-d-field: #0c1222;  --bcs-d-solid: #080d1a;  --bcs-d-chip: #1c2540;  --bcs-d-track: #1c2540;
+  --bcs-d-ink: #e7eaf3;  --bcs-d-soft: #97a2bf;  --bcs-d-rule: #2a3556;
+  --bcs-d-accent: #e2bb68;  --bcs-d-accent2: #c99f4c;  --bcs-d-btn: #a3263a;  --bcs-d-btn-hover: #bd3047;  --bcs-d-btn-ink: #fff;
+  --bcs-d-gilt: #e2bb68;  --bcs-d-red: #ff6b70;  --bcs-d-green: #7fd59a;  --bcs-d-blue: #6fa4ff;  --bcs-d-orange: #ffa24d;
+  --bcs-d-chat: #161e33;  --bcs-d-shadow: rgba(0, 0, 0, .7);
+}
+/* Ardoise : gris bleuté et bleu, sobre */
+body.bcs-on.bcs-pal-ardoise {
+  --bcs-l-bg: #f7f8fa;  --bcs-l-bg2: #eef0f4;  --bcs-l-win: #e7eaf0;  --bcs-l-head: #dce1e9;
+  --bcs-l-field: #fff;  --bcs-l-solid: #fff;  --bcs-l-chip: #e6e9ef;  --bcs-l-track: #dde2ea;
+  --bcs-l-ink: #1e2430;  --bcs-l-soft: #5d6677;  --bcs-l-rule: #c9cfda;
+  --bcs-l-accent: #2f5597;  --bcs-l-accent2: #22406f;  --bcs-l-btn: #2f5597;  --bcs-l-btn-hover: #22406f;  --bcs-l-btn-ink: #fff;
+  --bcs-l-gilt: #2b7a78;  --bcs-l-red: #c0392b;  --bcs-l-green: #2e7d4f;  --bcs-l-blue: #2f6fd6;  --bcs-l-orange: #c96a12;
+  --bcs-l-chat: #f9fafb;  --bcs-l-shadow: rgba(20, 25, 35, .35);
+
+  --bcs-d-bg: #1d2129;  --bcs-d-bg2: #191c23;  --bcs-d-win: linear-gradient(#1c2027, #13161b);  --bcs-d-head: #101216;
+  --bcs-d-field: #14171d;  --bcs-d-solid: #0f1115;  --bcs-d-chip: #262b35;  --bcs-d-track: #262b35;
+  --bcs-d-ink: #e6e9ef;  --bcs-d-soft: #9aa3b2;  --bcs-d-rule: #343a46;
+  --bcs-d-accent: #8fb4ff;  --bcs-d-accent2: #6f98ea;  --bcs-d-btn: #3d63a8;  --bcs-d-btn-hover: #4a74bd;  --bcs-d-btn-ink: #fff;
+  --bcs-d-gilt: #6fc3bf;  --bcs-d-red: #ff7b72;  --bcs-d-green: #7ee2a0;  --bcs-d-blue: #79a8ff;  --bcs-d-orange: #ffab5e;
+  --bcs-d-chat: #1f232b;  --bcs-d-shadow: rgba(0, 0, 0, .6);
+}
+/* Forêt : cuir clair et vert sapin le jour, sous-bois et vert tendre la nuit */
+body.bcs-on.bcs-pal-foret {
+  --bcs-l-bg: #f3f1e7;  --bcs-l-bg2: #ebe8da;  --bcs-l-win: #e4e1d1;  --bcs-l-head: #d9d5c0;
+  --bcs-l-field: #fbfaf3;  --bcs-l-solid: #fff;  --bcs-l-chip: #e3e0cf;  --bcs-l-track: #ddd9c6;
+  --bcs-l-ink: #22261d;  --bcs-l-soft: #5e6452;  --bcs-l-rule: #c4c1a8;
+  --bcs-l-accent: #2f5d3a;  --bcs-l-accent2: #21442a;  --bcs-l-btn: #2f5d3a;  --bcs-l-btn-hover: #21442a;  --bcs-l-btn-ink: #fff;
+  --bcs-l-gilt: #8a6a2f;  --bcs-l-red: #b3362c;  --bcs-l-green: #3d7a3a;  --bcs-l-blue: #2d5f9a;  --bcs-l-orange: #b8650f;
+  --bcs-l-chat: #f5f3ea;  --bcs-l-shadow: rgba(30, 35, 25, .4);
+
+  --bcs-d-bg: #171c16;  --bcs-d-bg2: #131712;  --bcs-d-win: radial-gradient(120% 80% at 50% 0%, #1b2219, #0b0e0a);  --bcs-d-head: #090b08;
+  --bcs-d-field: #10140f;  --bcs-d-solid: #0b0e0a;  --bcs-d-chip: #222a20;  --bcs-d-track: #222a20;
+  --bcs-d-ink: #e6eadf;  --bcs-d-soft: #a0aa94;  --bcs-d-rule: #333d30;
+  --bcs-d-accent: #b5d68f;  --bcs-d-accent2: #98bd72;  --bcs-d-btn: #4f7a3a;  --bcs-d-btn-hover: #5d8b46;  --bcs-d-btn-ink: #fff;
+  --bcs-d-gilt: #d4b06a;  --bcs-d-red: #ff7a6b;  --bcs-d-green: #9fdc8a;  --bcs-d-blue: #7fb0e8;  --bcs-d-orange: #f0a250;
+  --bcs-d-chat: #1a2018;  --bcs-d-shadow: rgba(0, 0, 0, .65);
+}
+
+/* ---------------------------------------------------------------- modes
+   Clair / Sombre forcés, ou « Suivre Foundry » (bcs-auto) : chaque fenêtre suit son propre thème de Foundry
+   (theme-dark / theme-light sur la fenêtre, l'interface ou la page). Les couleurs dérivées sont recalculées ici,
+   au même endroit, pour suivre le mode. */
+body.bcs-on,
+body.bcs-on.bcs-auto .theme-light {
+  --bcs-bg: var(--bcs-l-bg);  --bcs-bg2: var(--bcs-l-bg2);  --bcs-win: var(--bcs-l-win);  --bcs-head: var(--bcs-l-head);
+  --bcs-field: var(--bcs-l-field);  --bcs-solid: var(--bcs-l-solid);  --bcs-chip: var(--bcs-l-chip);  --bcs-track: var(--bcs-l-track);
+  --bcs-ink: var(--bcs-l-ink);  --bcs-soft: var(--bcs-l-soft);  --bcs-rule: var(--bcs-l-rule);
+  --bcs-accent: var(--bcs-l-accent);  --bcs-accent2: var(--bcs-l-accent2);
+  --bcs-btn: var(--bcs-l-btn);  --bcs-btn-hover: var(--bcs-l-btn-hover);  --bcs-btn-ink: var(--bcs-l-btn-ink);
+  --bcs-gilt: var(--bcs-l-gilt);  --bcs-red: var(--bcs-l-red);  --bcs-green: var(--bcs-l-green);  --bcs-blue: var(--bcs-l-blue);  --bcs-orange: var(--bcs-l-orange);
+  --bcs-chat: var(--bcs-l-chat);  --bcs-shadow: var(--bcs-l-shadow);
+  --bcs-row: color-mix(in srgb, var(--bcs-rule) 55%, transparent);
+  --bcs-zebra: color-mix(in srgb, var(--bcs-chip) 45%, transparent);
+  --bcs-hover: color-mix(in srgb, var(--bcs-accent) 6%, transparent);
+  --bcs-tab: color-mix(in srgb, var(--bcs-field) 60%, transparent);
+  --bcs-ok-bg: color-mix(in srgb, var(--bcs-green) 15%, var(--bcs-field));
+  --bcs-ok-border: color-mix(in srgb, var(--bcs-green) 40%, var(--bcs-field));
+  --bcs-minus-bg: color-mix(in srgb, var(--bcs-red) 15%, var(--bcs-field));
+}
+body.bcs-on.bcs-dark,
+body.bcs-on.bcs-auto.theme-dark,
+body.bcs-on.bcs-auto .theme-dark,
+/* Foundry garde la liste du chat en thème clair même dans une interface sombre : le chat suit l'interface */
+body.bcs-on.bcs-auto #interface.theme-dark .chat-message {
+  --bcs-bg: var(--bcs-d-bg);  --bcs-bg2: var(--bcs-d-bg2);  --bcs-win: var(--bcs-d-win);  --bcs-head: var(--bcs-d-head);
+  --bcs-field: var(--bcs-d-field);  --bcs-solid: var(--bcs-d-solid);  --bcs-chip: var(--bcs-d-chip);  --bcs-track: var(--bcs-d-track);
+  --bcs-ink: var(--bcs-d-ink);  --bcs-soft: var(--bcs-d-soft);  --bcs-rule: var(--bcs-d-rule);
+  --bcs-accent: var(--bcs-d-accent);  --bcs-accent2: var(--bcs-d-accent2);
+  --bcs-btn: var(--bcs-d-btn);  --bcs-btn-hover: var(--bcs-d-btn-hover);  --bcs-btn-ink: var(--bcs-d-btn-ink);
+  --bcs-gilt: var(--bcs-d-gilt);  --bcs-red: var(--bcs-d-red);  --bcs-green: var(--bcs-d-green);  --bcs-blue: var(--bcs-d-blue);  --bcs-orange: var(--bcs-d-orange);
+  --bcs-chat: var(--bcs-d-chat);  --bcs-shadow: var(--bcs-d-shadow);
+  --bcs-row: color-mix(in srgb, var(--bcs-rule) 80%, transparent);
+  --bcs-zebra: color-mix(in srgb, var(--bcs-ink) 4%, transparent);
+  --bcs-hover: color-mix(in srgb, var(--bcs-accent) 8%, transparent);
+  --bcs-tab: color-mix(in srgb, var(--bcs-accent) 8%, transparent);
+  --bcs-ok-bg: color-mix(in srgb, var(--bcs-green) 18%, var(--bcs-field));
+  --bcs-ok-border: color-mix(in srgb, var(--bcs-green) 40%, var(--bcs-field));
+  --bcs-minus-bg: color-mix(in srgb, var(--bcs-red) 20%, var(--bcs-field));
+}
+
+/* ---------------------------------------------------------------- fenêtres (fiches et fenêtres de jet)
+   Fiches : acteurs et objets en ApplicationV2, sauf les templates (mode construction). */
+body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, ._equippableItemTemplate, .subTemplate, .userInputTemplate),
+body.bcs-on .application.custom-dialog {
+  font-family: var(--bcs-body);
+  color: var(--bcs-ink);
+  color-scheme: light;
+
+  & .window-header {
+    background: var(--bcs-head);
+    color: var(--bcs-ink);
+    border-bottom: 1px solid var(--bcs-rule);
+  }
+  & .window-header :is(.window-title, button, a) { color: var(--bcs-ink); }
+  & .window-header .window-title { font: 700 15px var(--bcs-display); letter-spacing: .03em; }
+  /* Taille de base lisible : certains templates descendent à 11 px pour toute la fiche */
+  & .window-content { background: var(--bcs-win); color: var(--bcs-ink); font-size: 13px; }
+}
+body.bcs-on:is(.bcs-dark, .bcs-auto.theme-dark) .application:is(.custom-system, .custom-dialog),
+body.bcs-on.bcs-auto .application.theme-dark:is(.custom-system, .custom-dialog) { color-scheme: dark; }
+body.bcs-on .application.custom-dialog .window-content { background: linear-gradient(var(--bcs-bg), var(--bcs-bg2)); }
+body.bcs-on:is(.bcs-dark, .bcs-auto.theme-dark) .application.custom-dialog .window-content,
+body.bcs-on.bcs-auto .application.custom-dialog.theme-dark .window-content { background: var(--bcs-win); }
+
+/* ---------------------------------------------------------------- en-tête de fiche (portrait, nom, en-tête du template) */
+body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, ._equippableItemTemplate, .subTemplate, .userInputTemplate) {
+  & .sheet-header {
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    background: linear-gradient(var(--bcs-bg), var(--bcs-bg2));
+    border: 1px solid var(--bcs-rule);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px -10px var(--bcs-shadow);
+  }
+  /* Portrait : cadre fixe, l'image le remplit quelle que soit sa forme */
+  & .profile-img-container {
+    flex: 0 0 auto;
+    border: 2px solid var(--bcs-gilt);
+    border-radius: 8px;
+    overflow: hidden;
+    /* Fond sombre fixe : le portrait par défaut de Foundry (silhouette blanche) reste visible dans tous les modes */
+    background: #1f1b18;
+    box-shadow: 0 4px 12px -6px rgba(0, 0, 0, .5);
+  }
+  /* CSB inverse ce portrait par défaut en thème clair de Foundry (silhouette noire) : on le garde blanc sur le fond sombre */
+  & .profile-img.csb-filter-default-svg { filter: none; }
+  & .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 20%;
+    border: 0;
+  }
+  & :is(.charname, .itemname) { margin: 0 0 4px; border: 0; }
+  & .sheet-header :is(.charname, .itemname) input {
+    height: auto;
+    padding: 0;
+    font: 800 28px/1.15 var(--bcs-display);
+    letter-spacing: .02em;
+    color: var(--bcs-ink);
+    background: transparent;
+    border: 0 !important;
+    border-bottom: 1px dashed transparent !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  & .sheet-header :is(.charname, .itemname) input:hover { border-bottom-color: var(--bcs-rule) !important; }
+  & .sheet-header :is(.charname, .itemname) input:focus { border-bottom-color: var(--bcs-accent) !important; box-shadow: none; }
+  /* Sélecteur de modèle : discret tant qu'on ne le survole pas */
+  & .custom-system-sheet-actions { font-size: 11px; opacity: .55; transition: opacity .12s; }
+  & .custom-system-sheet-actions:hover, & .custom-system-sheet-actions:focus-within { opacity: 1; }
+  & .custom-system-sheet-actions a { color: var(--bcs-soft); }
+}
+
+/* ---------------------------------------------------------------- composants CSB
+   Fiches, et contenu des fenêtres de jet (un template de saisie a le même HTML qu'une fiche). */
+body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, ._equippableItemTemplate, .subTemplate, .userInputTemplate),
+body.bcs-on .application.custom-dialog {
+
+  /* Champs */
+  & :is(input[type="text"], input[type="number"], input:not([type]), select, textarea) {
+    font-family: var(--bcs-body);
+    color: var(--bcs-ink);
+    background: var(--bcs-field);
+    /* !important : certains modules de fiches retirent toutes les bordures des champs (input { border: 0 !important }) */
+    border: 1px solid var(--bcs-rule) !important;
+    border-radius: 6px;
+  }
+  & :is(input[type="text"], input[type="number"], input:not([type]), select, textarea):focus {
+    border-color: var(--bcs-accent) !important;
+    box-shadow: 0 0 0 1px var(--bcs-accent);
+    outline: none;
+  }
+  /* Champ en lecture seule (formule, fiche verrouillée) : du texte, pas une case vide */
+  & :is(input[type="text"], input[type="number"], input:not([type]), select, textarea):disabled {
+    color: var(--bcs-ink);
+    background: transparent;
+    border-color: transparent !important;
+    opacity: 1;
+  }
+  & :is(input[type="checkbox"], input[type="radio"]) {
+    accent-color: var(--bcs-accent);
+    --checkbox-checked-color: var(--bcs-accent);
+    --checkbox-checkmark-color: var(--bcs-field);
+    /* Foundry dessine la case avec cette couleur, sans bordure : un ton moyen pour qu'elle se voie sur le fond */
+    --checkbox-background-color: color-mix(in srgb, var(--bcs-soft) 40%, var(--bcs-field));
+  }
+  /* Nom d'un champ (« Force », « Niveau »…) */
+  & .custom-system-field-root > label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--bcs-soft);
+  }
+
+  /* Boutons − / + des champs nombre (couleurs seulement : CSB les place lui-même) */
+  & .custom-system-number-field-control {
+    color: var(--bcs-ink);
+    background: var(--bcs-chip);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 6px;
+    transition: border-color .12s, background .12s;
+  }
+  & .custom-system-number-field-control:hover { color: var(--bcs-accent); background: var(--bcs-field); border-color: var(--bcs-accent); }
+  /* Boutons toujours visibles : ils ne se font plus écraser par le champ */
+  & .custom-system-number-input-span-full-controls { gap: 4px; align-items: center; }
+  & .custom-system-number-input-span-full-controls .custom-system-number-field-control { flex: 0 0 auto; min-width: 26px; }
+  & .custom-system-number-input-span-full-controls input:not([type="hidden"]) { min-width: 3em; text-align: center; }
+  /* Champ nombre étroit : moins de marge intérieure et une largeur minimale, pour que la valeur reste lisible */
+  & .custom-system-number-field input:not([type="hidden"]) { min-width: 2.8em; padding-inline: 4px; text-align: center; }
+  /* Boutons − / + qui apparaissent au survol, à côté du champ : au-dessus des champs voisins, jamais coupés */
+  & .custom-system-number-field:is(:hover, :focus-within) { z-index: 5; }
+  & .custom-system-number-field-controls-multi-buttons-span { z-index: 2; }
+  & .custom-system-number-field-controls-multi-buttons-span .custom-system-number-field-control {
+    background: var(--bcs-solid);
+    box-shadow: 0 2px 6px -2px var(--bcs-shadow);
+  }
+
+  /* Textes : titre, sous-titre, gras */
+  & .custom-system-label-title {
+    font: 700 17px/1.25 var(--bcs-display);
+    letter-spacing: .03em;
+    color: var(--bcs-accent);
+  }
+  & h3.custom-system-label-root { margin: 4px 0 6px; padding-bottom: 3px; border-bottom: 1px solid var(--bcs-rule); }
+  & .custom-system-label-subtitle { font: 700 14.5px/1.25 var(--bcs-display); letter-spacing: .03em; color: var(--bcs-ink); }
+  & h4.custom-system-label-root { margin: 2px 0 4px; border: 0; }
+  & .custom-system-label-bold { font-weight: 700; }
+
+  /* Textes qui lancent un jet */
+  & .custom-system-rollable, & .custom-system-rollable * { color: var(--bcs-accent); text-shadow: none; }
+  & .custom-system-rollable:hover, & .custom-system-rollable:hover * { color: var(--bcs-accent2); }
+  & .custom-system-roll-icon { margin-right: 3px; font-size: .9em; }
+  /* Texte en style bouton */
+  & a.button.custom-system-label-root {
+    min-height: 28px;
+    margin: 0;
+    padding: 4px 10px;
+    border: 0;
+    border-radius: 7px;
+    background: var(--bcs-btn);
+    box-shadow: 0 3px 8px -5px var(--bcs-shadow);
+    line-height: 1.2;
+    transition: background .12s;
+  }
+  & a.button.custom-system-label-root, & a.button.custom-system-label-root * { color: var(--bcs-btn-ink); font-weight: 700; text-decoration: none; }
+  & a.button.custom-system-label-root:hover { background: var(--bcs-btn-hover); }
+
+  /* Onglets */
+  & nav.custom-tabs {
+    gap: 4px;
+    border-top: 0;
+    border-bottom: 2px solid var(--bcs-rule);
+  }
+  & nav.custom-tabs .item {
+    display: inline-block;
+    margin-bottom: -2px;
+    padding: 7px 14px 6px;
+    font: 700 15px var(--bcs-display);
+    letter-spacing: .04em;
+    color: var(--bcs-soft);
+    border-bottom: 2px solid transparent;
+    border-radius: 6px 6px 0 0;
+    text-shadow: none;
+  }
+  & nav.custom-tabs .item:hover { color: var(--bcs-ink); }
+  & nav.custom-tabs .item.active { color: var(--bcs-accent); border-bottom-color: var(--bcs-accent); background: var(--bcs-tab); }
+  & .custom-system-component-root.tab { padding-top: 6px; }
+
+  /* Panneaux repliables */
+  & details > summary {
+    cursor: pointer;
+    font: 700 15px var(--bcs-display);
+    letter-spacing: .03em;
+    color: var(--bcs-accent);
+  }
+  & details > summary :is(.custom-system-panel-title, .custom-system-panel-default) { font: inherit; color: inherit; }
+  & details > hr { border: 0; border-top: 1px solid var(--bcs-rule); }
+
+  /* Tableaux (tableaux fixes : simple mise en page, sans cadre) */
+  /* overflow visible : un tableau de mise en page ne coupe plus les boutons − / + qui dépassent de ses champs */
+  & table { background: transparent; border: 0; overflow: visible; }
+  & tr, & tr:nth-child(even), & tr:nth-child(odd) { background: transparent; }
+  & table caption {
+    padding: 2px 4px 5px;
+    text-align: left;
+    font: 700 15px var(--bcs-display);
+    letter-spacing: .03em;
+    color: var(--bcs-accent);
+  }
+  & table caption:empty { display: none; }
+  /* Tableaux dynamiques et listes d'objets : en-tête discret, lignes zébrées */
+  & table:has(> tbody > tr.custom-system-dynamicRow), & table:has(> tbody > tr > .custom-system-dynamic-table-container-label-when-empty) {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  & td.custom-system-cell-boldTitle {
+    padding: 3px 6px 5px;
+    border-bottom: 1px solid var(--bcs-rule);
+  }
+  & td.custom-system-cell-boldTitle, & td.custom-system-cell-boldTitle * {
+    font: 700 10.5px var(--bcs-body);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--bcs-soft);
+  }
+  & tr.custom-system-dynamicRow > td { padding: 4px 6px; border-bottom: 1px solid var(--bcs-row); }
+  & tr.custom-system-dynamicRow:nth-child(even) > td { background: var(--bcs-zebra); }
+  & tr.custom-system-dynamicRow:hover > td { background: var(--bcs-hover); }
+  & :is(.custom-system-dynamic-table-row-icons, .custom-system-dynamic-table-sort-icon-wrapper) a { color: var(--bcs-soft); }
+  & :is(.custom-system-dynamic-table-row-icons, .custom-system-dynamic-table-sort-icon-wrapper) a:hover { color: var(--bcs-accent); }
+  & a.custom-system-deleteDynamicLine:hover { color: var(--bcs-red); }
+  & a.custom-system-addDynamicLine { color: var(--bcs-accent); }
+  & a.custom-system-addDynamicLine:hover { color: var(--bcs-accent2); }
+  & :is(.custom-system-dynamic-table-container-label-when-empty, .custom-system-item-container-label-when-empty, .custom-system-active-effects-container-label-when-empty) {
+    padding: 6px;
+    font-style: italic;
+    color: var(--bcs-soft);
+  }
+  & img:is(.custom-system-item-container-image, .custom-system-active-effect-container-image) {
+    border: 1px solid var(--bcs-rule);
+    border-radius: 5px;
+    object-fit: cover;
+  }
+  & a.content-link { color: var(--bcs-ink); background: var(--bcs-chip); border-color: var(--bcs-rule); }
+  & a.content-link:hover { border-color: var(--bcs-accent); }
+  & a.content-link i { color: var(--bcs-soft); }
+
+  /* Jauges : CSB colore le remplissage lui-même (vert, orange, rouge) */
+  & .custom-system-meter {
+    background: var(--bcs-track);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 99px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .15);
+    overflow: hidden;
+  }
+  & .custom-system-meter-fill { border-radius: inherit; }
+  & .custom-system-meter-content {
+    font: 700 11.5px var(--bcs-body);
+    font-variant-numeric: tabular-nums;
+    color: var(--bcs-ink);
+    text-shadow: 0 0 2px var(--bcs-field), 0 0 2px var(--bcs-field), 0 0 3px var(--bcs-field);
+  }
+
+  /* Texte enrichi (description, notes) */
+  & .custom-system-rich-content {
+    padding: 4px 8px;
+    background: var(--bcs-field);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 6px;
+    color: var(--bcs-ink);
+  }
+  & a.custom-system-rich-editor-button { color: var(--bcs-soft); }
+  & a.custom-system-rich-editor-button:hover { color: var(--bcs-accent); }
+
+  /* Images */
+  & .custom-system-picture img { border: 1px solid var(--bcs-rule); border-radius: 6px; }
+}
+
+/* ---------------------------------------------------------------- fenêtres de jet : bouton et variables saisies */
+body.bcs-on .application.custom-dialog {
+  & .dialog-content { gap: 6px; }
+  & .form-footer button {
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--bcs-btn);
+    color: var(--bcs-btn-ink);
+    font: 700 15px var(--bcs-display);
+    letter-spacing: .06em;
+    box-shadow: 0 4px 12px -6px var(--bcs-shadow);
+    transition: background .12s, transform .12s;
+  }
+  & .form-footer button:hover { background: var(--bcs-btn-hover); transform: translateY(-1px); }
+  & .form-footer button i { color: inherit; }
+
+  /* Fenêtre des variables saisies au lancement d'un jet : une ligne par variable, − valeur + centrés */
+  & table.custom-system-user-inputs { width: 100%; margin: 4px 0; border: 0; background: transparent; }
+  & .custom-system-user-inputs thead { display: none; }
+  & .custom-system-user-inputs td { padding: 3px 4px; border: 0; background: transparent; vertical-align: middle; }
+  & .custom-system-user-inputs label { font: 700 14.5px var(--bcs-display); letter-spacing: .03em; color: var(--bcs-accent); }
+  & .custom-system-user-input-block { display: flex; justify-content: center; align-items: center; gap: 6px; }
+  & .custom-system-user-input-button {
+    flex: 0 0 auto;
+    min-width: 36px;
+    height: 32px;
+    margin: 0;
+    color: var(--bcs-ink);
+    background: var(--bcs-chip);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 7px;
+    font: 700 14px var(--bcs-body);
+  }
+  & .custom-system-user-input-button:hover { color: var(--bcs-accent); background: var(--bcs-field); border-color: var(--bcs-accent); }
+  & input.custom-system-user-input { height: 32px; text-align: center; font: 800 16px var(--bcs-body); font-variant-numeric: tabular-nums; }
+  & input.custom-system-user-input[type="number"] { flex: 0 0 4.2em; width: 4.2em; }
+}
+
+/* =====================================================================
+   Chat : tous les messages (texte, jets /r, chuchotements, messages des fiches CSB)
+   ===================================================================== */
+body.bcs-on .chat-message {
+  background: linear-gradient(var(--bcs-chat), var(--bcs-bg2)) !important;
+  border: 1px solid var(--bcs-rule) !important;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px -5px rgba(0, 0, 0, .45);
+  color: var(--bcs-ink);
+
+  & .message-header, & .message-header *:not(i):not([class*="fa-"]) { font-family: var(--bcs-body); }
+  & .message-header * { color: var(--bcs-soft); }
+  & .message-header .message-sender { color: var(--bcs-ink); font-weight: 700; }
+  & .message-header .flavor-text {
+    flex: 0 0 100%;
+    margin-top: 2px;
+    font: 700 14px/1.25 var(--bcs-display) !important;
+    letter-spacing: .03em;
+    color: var(--bcs-accent) !important;
+  }
+  & .message-header .whisper-to {
+    flex: 0 0 100%;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  & .message-content { font: 400 14px/1.45 var(--bcs-body); color: var(--bcs-ink); }
+  & .message-content a:not(.inline-roll):not(.content-link) { color: var(--bcs-accent); }
+  & .message-content :is(h1, h2, h3, h4) { font-family: var(--bcs-display); color: var(--bcs-accent); border-color: var(--bcs-rule); }
+}
+/* Chuchotement, jet aveugle, emote : même carte, repérables d'un coup d'œil */
+body.bcs-on .chat-message.whisper { border-style: dashed !important; border-color: var(--bcs-gilt) !important; }
+body.bcs-on .chat-message.blind { border-style: dashed !important; border-color: var(--bcs-blue) !important; }
+body.bcs-on .chat-message.emote .message-content { font-style: italic; }
+
+/* ---------------------------------------------------------------- jets de Foundry (/r, jets de macros) */
+body.bcs-on .chat-message .dice-roll {
+  gap: 4px;
+
+  & .dice-flavor { text-align: center; font: 700 15px/1.25 var(--bcs-display); letter-spacing: .03em; color: var(--bcs-accent); }
+  & .dice-result { display: grid; justify-items: center; gap: 4px; }
+  /* La formule en pastille, au-dessus du grand chiffre */
+  & .dice-formula {
+    flex: none;
+    justify-self: center;
+    margin: 0;
+    padding: 1px 10px;
+    line-height: 20px;
+    background: var(--bcs-field);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 99px;
+    box-shadow: none;
+    font: 700 12.5px var(--bcs-body);
+    color: var(--bcs-soft);
+  }
+  & .dice-total {
+    order: 1;
+    margin: 0;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    font: 800 34px/1.05 var(--bcs-body);
+    font-variant-numeric: tabular-nums;
+    color: var(--bcs-ink);
+  }
+  & .dice-total.success { color: var(--bcs-green); }
+  & .dice-total.failure { color: var(--bcs-red); }
+  & .dice-tooltip { order: 2; width: 100%; }
+  /* Les dés sous le total, toujours visibles (scripts/main.js) : « 4 + 6 + 2 » */
+  & .bcs-des {
+    order: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font: 700 13px var(--bcs-body);
+    font-variant-numeric: tabular-nums;
+    color: var(--bcs-soft);
+  }
+}
+body.bcs-on .chat-message .dice-roll + .dice-roll { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--bcs-rule); }
+
+/* ---------------------------------------------------------------- résultats des jets des fiches CSB
+   CSB pose une pastille grise codée en dur (#ddd), illisible de nuit : pastille aux couleurs de la palette. */
+body.bcs-on .chat-message .custom-system-roll {
+  padding: 0 5px;
+  background: var(--bcs-field);
+  border: 1px solid var(--bcs-rule);
+  border-radius: 4px;
+  color: var(--bcs-ink);
+  font-weight: 700;
+}
+body.bcs-on .chat-message .custom-system-roll i { color: var(--bcs-accent); }
+body.bcs-on .chat-message .custom-system-hidden-roll { border-style: dashed; color: var(--bcs-soft); }
+/* Message réduit à un seul résultat (initiative…) : le grand chiffre centré, comme le total des jets /r */
+body.bcs-on .chat-message .message-content:has(> .custom-system-roll:only-child) { text-align: center; }
+body.bcs-on .chat-message .message-content > .custom-system-roll:only-child {
+  padding: 0;
+  background: none;
+  border: 0;
+  font: 800 34px/1.05 var(--bcs-body);
+  font-variant-numeric: tabular-nums;
+}
+body.bcs-on .chat-message .message-content > .custom-system-roll:only-child i { display: none; }
+/* Jets en ligne ([[1d20]]) : même pastille */
+body.bcs-on .chat-message a.inline-roll {
+  padding: 0 5px;
+  background: var(--bcs-field);
+  border: 1px solid var(--bcs-rule);
+  border-radius: 4px;
+  color: var(--bcs-ink);
+  font-weight: 700;
+}
+body.bcs-on .chat-message a.inline-roll i { color: var(--bcs-accent); }
+
+/* ---------------------------------------------------------------- détail des dés (clic sur un jet) */
+body.bcs-on .chat-message .dice-tooltip {
+  & .wrapper { padding-top: 4px; }
+  & .tooltip-part {
+    margin-top: 4px;
+    padding: 4px 8px 2px;
+    background: var(--bcs-field);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 6px;
+  }
+  & .part-header { border-bottom: 1px solid var(--bcs-rule); font-size: 12.5px; color: var(--bcs-soft); }
+  & .part-header .part-formula { color: var(--bcs-ink); }
+  & .part-header .part-flavor { color: var(--bcs-soft); }
+  & .part-header .part-total { background: var(--bcs-chip); border: 1px solid var(--bcs-rule); border-bottom: 0; color: var(--bcs-ink); }
+  & .dice-rolls { display: flex; flex-wrap: wrap; gap: 3px; }
+}
+/* Rangée de dés sous les messages des fiches CSB */
+body.bcs-on .chat-message .custom-system-dice-tooltip .dice-rolls { align-items: center; gap: 4px; }
+body.bcs-on .chat-message .custom-system-dice-pool { display: inline-flex; gap: 3px; margin: 0; padding: 0; }
+body.bcs-on .chat-message .custom-system-dice-pool-multiple { padding: 2px; border: 1px solid var(--bcs-rule); border-radius: 7px; }
+
+/* Fenêtre de détail d'un jet de fiche (CSB, au clic), réécrite par scripts/main.js */
+body.bcs-on .chat-message .custom-roll-tooltip.bcs-dt-tooltip {
+  width: 280px;
+  padding: 8px 10px;
+  background: var(--bcs-chat);
+  border: 1px solid var(--bcs-rule);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px var(--bcs-shadow);
+  color: var(--bcs-ink);
+  font: 400 13px/1.35 var(--bcs-body);
+  text-shadow: none;
+
+  & .tooltip-part { margin: 0; padding: 0; background: none; border: 0; }
+  & .bcs-dt-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--bcs-rule);
+    font: 700 14px var(--bcs-display);
+    letter-spacing: .03em;
+    color: var(--bcs-accent);
+  }
+  & .bcs-dt-total { font: 800 22px/1 var(--bcs-body); font-variant-numeric: tabular-nums; color: var(--bcs-ink); }
+  & .bcs-dt-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 3px 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--bcs-row);
+  }
+  & .bcs-dt-row:last-of-type { border-bottom: 0; }
+  & .bcs-dt-name { font-weight: 700; color: var(--bcs-ink); }
+  & .bcs-dt-count { justify-self: end; font-size: 12px; font-weight: 700; color: var(--bcs-soft); }
+  & .bcs-dt-dice { display: flex; flex-wrap: wrap; gap: 3px; }
+  & .bcs-dt-value { justify-self: end; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--bcs-ink); }
+  & .bcs-dt-value::before { content: "= "; font-weight: 400; color: var(--bcs-soft); }
+  & .bcs-dt-neg :is(.bcs-dt-count, .bcs-dt-value) { color: var(--bcs-red); }
+  & .bcs-dt-empty { padding: 6px 0; font-style: italic; color: var(--bcs-soft); }
+  /* La formule de la variable, puis une ligne par variable utilisée : nom, dés éventuels, valeur */
+  & .bcs-dt-formula {
+    margin: 2px 0 4px;
+    padding: 3px 7px;
+    background: var(--bcs-field);
+    border: 1px solid var(--bcs-rule);
+    border-radius: 5px;
+    font: 600 12.5px/1.4 ui-monospace, Consolas, monospace;
+    color: var(--bcs-ink);
+    overflow-wrap: anywhere;
+  }
+  & .bcs-dt-row.bcs-dt-var { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  & .bcs-dt-var .bcs-dt-value { margin-left: auto; }
+  & .bcs-dt-calc { margin-top: 6px; font-size: 12px; color: var(--bcs-soft); }
+  & .bcs-dt-calc summary { cursor: pointer; }
+  & .bcs-dt-calc ol { margin: 4px 0 0; padding: 0; list-style: none; }
+}
+
+/* ---------------------------------------------------------------- dés
+   Un dé = une pastille, partout : bandeau sous le total, détail au clic, rangée de dés des messages de fiche.
+   d4 à d20 (et d100) : le dessin du dé de Foundry (icons/svg) en pochoir, teinté selon le résultat, le chiffre
+   par-dessus détouré de la couleur du fond. Autres dés (d3, d2…) : petite pastille carrée. */
+body.bcs-on .chat-message :is(.bcs-de, .dice-tooltip .dice-rolls .roll) {
+  --bcs-de-tint: var(--bcs-soft);
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  float: none;
+  min-width: 22px;
+  height: 22px;
+  margin: 0;
+  padding: 0 3px;
+  background: var(--bcs-chip);
+  border: 1px solid var(--bcs-rule);
+  border-radius: 5px;
+  filter: none;
+  font: 700 12.5px var(--bcs-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--bcs-ink);
+
+  &:is(.max, .success) { --bcs-de-tint: var(--bcs-green); background: var(--bcs-ok-bg); border-color: var(--bcs-ok-border); color: var(--bcs-green); }
+  &:is(.min, .failure) { --bcs-de-tint: var(--bcs-red); background: var(--bcs-minus-bg); color: var(--bcs-red); }
+  &:is(.discarded, .rerolled) { opacity: .45; text-decoration: line-through; }
+  &:is(.d4, .d6, .d8, .d10, .d12, .d20, .d100) {
+    min-width: 30px;
+    height: 30px;
+    padding: 0;
+    background: none;
+    border: 0;
+    font-size: 13px;
+    text-shadow: 0 0 2px var(--bcs-chat), 0 0 2px var(--bcs-chat), 0 0 3px var(--bcs-chat);
+  }
+  &:is(.d4, .d6, .d8, .d10, .d12, .d20, .d100)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--bcs-de-tint) 55%, transparent);
+    -webkit-mask: var(--bcs-de-img) center / contain no-repeat;
+    mask: var(--bcs-de-img) center / contain no-repeat;
+  }
+  &.d4 { --bcs-de-img: url("../../../icons/svg/d4-grey.svg"); }
+  &.d6 { --bcs-de-img: url("../../../icons/svg/d6-grey.svg"); }
+  /* Le d6 de Foundry est un carré plat : un peu plus petit et arrondi, pour peser comme les autres dés */
+  &.d6::before { inset: 3px; border-radius: 6px; }
+  &.d8 { --bcs-de-img: url("../../../icons/svg/d8-grey.svg"); }
+  &:is(.d10, .d100) { --bcs-de-img: url("../../../icons/svg/d10-grey.svg"); }
+  &.d12 { --bcs-de-img: url("../../../icons/svg/d12-grey.svg"); }
+  &.d20 { --bcs-de-img: url("../../../icons/svg/d20-grey.svg"); }
+}
+
+/* =====================================================================
+   Compatibilité avec des modules de fiches CSB connus
+   ===================================================================== */
+/* Brigandyne 2 - CSB - Feuilles de personnages : cases de progression aux couleurs de la palette (blanches sinon, même de nuit) */
+body.bcs-on .brig-progression-case {
+  background: var(--bcs-field) !important;
+  border-color: var(--bcs-soft) !important;
+  color: var(--bcs-accent);
+}
+body.bcs-on .brig-progression-case.is-checked { background: var(--bcs-field) !important; }
+body.bcs-on .brig-progression-case.is-locked { background: var(--bcs-soft) !important; border-color: var(--bcs-soft) !important; opacity: .55; }
+body.bcs-on .brig-progression-case:not(:disabled):hover { outline-color: var(--bcs-accent); }
+/* Résultats des messages de jet (réussite / échec) : vert et rouge de la palette, lisibles de nuit (darkgreen / darkred sinon) */
+body.bcs-on .chat-message .roll_win { color: var(--bcs-green); }
+body.bcs-on .chat-message .roll_lose { color: var(--bcs-red); }
