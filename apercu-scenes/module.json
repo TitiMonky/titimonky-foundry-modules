@@ -4,10 +4,11 @@
   "description": "GM only: hover a scene in the navigation bar to see its thumbnail and full name. Replaces Scene Preview, which stopped at Foundry v12.",
   "authors": [
     {
-      "name": "Théo Calvez"
+      "name": "TitiMonky",
+      "url": "https://github.com/TitiMonky"
     }
   ],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -20,5 +21,5 @@
   ],
   "url": "https://github.com/TitiMonky/titimonky-foundry-modules",
   "manifest": "https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/apercu-scenes/module.json",
-  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/apercu-scenes-v1.0.1/apercu-scenes.zip"
+  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/apercu-scenes-v1.0.2/apercu-scenes.zip"
 }
