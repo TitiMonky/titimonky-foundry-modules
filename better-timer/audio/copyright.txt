@@ -1,0 +1,6 @@
+end.wav : sonnerie de réveil « Twin Bell Alarm Clock », Orange Free Sounds (https://orangefreesounds.com),
+          gratuite pour un usage non commercial, avec ce crédit (conditions sur le site).
+          https://orangefreesounds.com/wp-content/uploads/2019/06/Twin-bell-alarm-clock.zip
+
+tick1.wav, tick2.wav : sons synthétiques fabriqués pour ce module (outils/generer-tictac.py du dépôt privé),
+          libres de droits, sous la même licence que le code du module.

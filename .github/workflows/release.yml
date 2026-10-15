@@ -1,0 +1,37 @@
+# Une release GitHub par nouvelle version de module : tag <id>-v<version>, avec <id>.zip et module.json.
+# Le module.json de la branche main sert de manifeste ; son champ download pointe vers le zip de la release.
+name: Releases
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publier les versions qui n'ont pas encore de release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for manifest in */module.json; do
+            dir=$(dirname "$manifest")
+            id=$(jq -r .id "$manifest")
+            version=$(jq -r .version "$manifest")
+            title=$(jq -r .title "$manifest")
+            tag="$id-v$version"
+            if gh release view "$tag" > /dev/null 2>&1; then
+              echo "$tag : déjà publiée"
+              continue
+            fi
+            rm -f "$id.zip"
+            (cd "$dir" && zip -rq "../$id.zip" . -x '.*')
+            gh release create "$tag" "$id.zip" "$manifest" --title "$title $version" --latest=false \
+              --notes "Installation dans Foundry : Modules complémentaires → Installer un module → coller le lien du manifeste : https://raw.githubusercontent.com/${{ github.repository }}/main/$id/module.json"
+            echo "$tag : publiée"
+          done

@@ -1,0 +1,41 @@
+#apng-cutin-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--cutin-fade, 250ms) ease;
+}
+
+#apng-cutin-layer.visible {
+  opacity: 1;
+}
+
+#apng-cutin-layer.clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+#apng-cutin-layer img,
+#apng-cutin-layer video {
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: contain;
+}
+
+#apng-cutin-layer.cover img,
+#apng-cutin-layer.cover video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+#apng-cutin-layer.stretch img,
+#apng-cutin-layer.stretch video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: fill;
+}

@@ -1,0 +1,233 @@
+/* Deux colonnes : choix de l'animation | cibles et résultat.
+   La hauteur est bornée à l'écran pour que le bouton PLAY reste visible. */
+.afx-dialog {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  /* Hauteur fixe (bornée à l'écran) et piste de grille bornée : chaque colonne défile si elle déborde */
+  grid-template-rows: minmax(0, 1fr);
+  height: min(600px, calc(100vh - 190px));
+  gap: 0.75rem;
+}
+
+.afx-dialog .afx-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.afx-dialog [hidden] {
+  display: none !important;
+}
+
+.afx-dialog .afx-source {
+  margin: 0;
+}
+
+.afx-dialog small {
+  opacity: 0.6;
+}
+
+/* Onglets Recettes / Bibliothèque */
+.afx-dialog .afx-tabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.afx-dialog .afx-tab {
+  flex: 1;
+}
+
+.afx-dialog .afx-tab input,
+.afx-dialog .afx-chip input {
+  display: none;
+}
+
+.afx-dialog .afx-tab span {
+  display: block;
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  border: 1px solid var(--color-border, #7a7971);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.afx-dialog .afx-tab input:checked + span,
+.afx-dialog .afx-chip input:checked + span {
+  background: var(--color-warm-2, #c9593f);
+  border-color: var(--color-warm-1, #ee9b3a);
+  color: #fff;
+}
+
+/* Catégories */
+.afx-dialog .afx-recipes select,
+.afx-dialog .afx-library input[type=search] {
+  width: 100%;
+}
+
+.afx-dialog .afx-library {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.afx-dialog .afx-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.afx-dialog .afx-chip span {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  border: 1px solid var(--color-border, #7a7971);
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.afx-dialog .afx-chip input:checked + span small {
+  opacity: 0.85;
+}
+
+.afx-dialog .afx-library select[name=libFile] {
+  width: 100%;
+  height: auto;
+  font-size: 0.8rem;
+}
+
+.afx-dialog .afx-library select[name=libFile] optgroup {
+  font-style: normal;
+  text-transform: capitalize;
+}
+
+.afx-dialog .afx-library .hint {
+  margin: 0;
+}
+
+/* Colonne de droite */
+.afx-dialog .afx-preview {
+  width: 100%;
+  height: 150px;
+  flex-shrink: 0;
+  margin-top: auto;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+}
+
+.afx-dialog fieldset {
+  margin: 0;
+}
+
+.afx-dialog .afx-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.afx-dialog .afx-target {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.afx-dialog .afx-target img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border: none;
+  border-radius: 50%;
+}
+
+.afx-dialog .afx-results,
+.afx-dialog .afx-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+.afx-dialog .afx-results:disabled {
+  opacity: 0.4;
+}
+
+/* Cible « Moi-même » en tête de liste, séparée des autres */
+.afx-dialog .afx-target.afx-self {
+  padding-bottom: 3px;
+  margin-bottom: 2px;
+  border-bottom: 1px dashed rgba(127, 127, 127, 0.45);
+}
+
+/* Durée : Normale / Longue (n s) / Permanente */
+.afx-dialog .afx-duration {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+}
+.afx-dialog .afx-duration label { display: inline-flex; align-items: center; gap: 0.3rem; }
+.afx-dialog .afx-duration input[type="number"] { width: 4em; height: 24px; text-align: center; }
+.afx-dialog .afx-duration .hint { flex-basis: 100%; margin: 2px 0 0; font-size: 0.85em; }
+
+/* Effets permanents en cours, chacun avec son bouton de retrait */
+.afx-dialog .afx-active-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 130px;
+  overflow-y: auto;
+}
+.afx-dialog .afx-active-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.afx-dialog .afx-active-row button { flex: 0 0 auto; width: 26px; height: 24px; padding: 0; line-height: 1; }
+.afx-dialog .afx-end-all { margin-top: 4px; height: 26px; }
+.afx-dialog .afx-active .hint { margin: 0; }
+
+/* Réglages des états animés */
+.afx-status-config table { width: 100%; margin: 0; }
+.afx-status-config td { padding: 3px 4px; vertical-align: middle; }
+.afx-status-config td:first-child { white-space: nowrap; }
+.afx-status-config td:nth-child(3) { width: 5.5em; }
+.afx-status-config input[type="number"] { width: 100%; text-align: center; }
+.afx-status-config .afx-status-icon { width: 22px; height: 22px; vertical-align: middle; border: none; margin-right: 4px; }
+.afx-status-config tbody { display: block; max-height: 60vh; overflow-y: auto; }
+.afx-status-config thead, .afx-status-config tbody tr { display: table; width: 100%; table-layout: fixed; }
+.afx-status-config th:first-child, .afx-status-config td:first-child { width: 11em; }
+.afx-status-config th:nth-child(3) { width: 5.5em; }
+
+/* Écran étroit : une seule colonne, tout défile */
+@media (max-width: 960px) {
+  .afx-dialog {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    overflow-y: auto;
+  }
+
+  .afx-dialog .afx-col {
+    overflow: visible;
+  }
+}
+
+/* -------------------------------------------- compacité (v1.3.1) */
+.afx-dialog .afx-col { gap: 0.4rem; }
+.afx-dialog fieldset { padding: 0.25rem 0.6rem 0.4rem; }
+.afx-dialog fieldset legend { padding: 0 0.3rem; font-size: 0.85em; font-weight: 700; }
+.afx-dialog .afx-targets { max-height: 170px; }
+.afx-dialog .afx-target img { width: 24px; height: 24px; }
+.afx-dialog .afx-results, .afx-dialog .afx-options, .afx-dialog .afx-duration { gap: 0.15rem 0.8rem; font-size: 0.92em; }
+.afx-dialog .afx-results label, .afx-dialog .afx-options label { display: inline-flex; align-items: center; gap: 0.25rem; }
+.afx-dialog .afx-info { margin-left: auto; opacity: 0.6; cursor: help; }
+
+/* Effets permanents : repliable, en bas de la colonne */
+.afx-dialog details.afx-active {
+  border: 1px solid var(--color-border, #7a7971);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+}
+.afx-dialog details.afx-active summary { cursor: pointer; font-size: 0.85em; font-weight: 700; }
+.afx-dialog details.afx-active[open] summary { margin-bottom: 0.3rem; }

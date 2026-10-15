@@ -1,0 +1,44 @@
+<div class="bt-root">
+  <div class="bt-form">
+    <div class="form-group">
+      <label>Type</label>
+      <select name="kind">{{selectOptions kinds selected=f.kind}}</select>
+    </div>
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" name="label" value="" placeholder="Facultatif (ex. : Le plafond s'effondre)" maxlength="80">
+    </div>
+  
+    <fieldset class="bt-only-down">
+      <legend>Durée</legend>
+      <div class="bt-hms">
+        <label><input type="number" name="h" value="{{h}}" min="0" max="99" step="1"><span>h</span></label>
+        <label><input type="number" name="m" value="{{m}}" min="0" step="1" autofocus><span>min</span></label>
+        <label><input type="number" name="s" value="{{s}}" min="0" step="1"><span>s</span></label>
+      </div>
+      <div class="bt-presets">
+        {{#each presets}}<button type="button" data-action="preset" data-sec="{{sec}}">{{label}}</button>{{/each}}
+      </div>
+    </fieldset>
+  
+    <div class="form-group">
+      <label>Tic-tac</label>
+      <select name="ticks">{{selectOptions tickChoices selected=f.ticks}}</select>
+    </div>
+    <div class="form-group bt-only-down">
+      <label>Son de fin</label>
+      <input type="checkbox" name="endSound" {{checked f.endSound}}>
+    </div>
+    <div class="form-group">
+      <label>Visible par</label>
+      <select name="visibility">{{selectOptions visibilityChoices selected=f.visibility}}</select>
+    </div>
+    <div class="form-group">
+      <label>Continuer pendant la pause du jeu</label>
+      <input type="checkbox" name="ignorePause" {{checked f.ignorePause}}>
+    </div>
+  </div>
+  <footer class="form-footer">
+    <button type="submit"><i class="fa-solid fa-play"></i> Lancer</button>
+  </footer>
+</div>

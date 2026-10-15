@@ -1,0 +1,346 @@
+/* =====================================================================
+   Jukebox Meyiv : DA des Légendes de Meyiv (même palette que fiche-meyiv / better-timer).
+   Sombre par défaut ; réglage client « Thème du jukebox » sur Clair → body.jbm-light.
+   #jbm-widget : widget (joueurs et MJ), déplaçable. .jbm-app : fenêtres du MJ (bibliothèque, ajout).
+   ===================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
+
+.jbm-ui,
+.application.jbm-app {
+  --jdr-vellum: #141b2d;
+  --jdr-paper-2: #10162a;
+  --jdr-field: #0c1222;
+  --jdr-chip: #1c2540;
+  --jdr-track: #1c2540;
+  --jdr-ink: #e7eaf3;
+  --jdr-ink-soft: #97a2bf;
+  --jdr-rule: #2a3556;
+  --jdr-row-rule: rgba(42, 53, 86, .8);
+  --jdr-bordeaux: #e2bb68;
+  --jdr-btn: #a3263a;
+  --jdr-btn-hover: #bd3047;
+  --jdr-btn-ink: #fff;
+  --jdr-gilt: #e2bb68;
+  --jdr-gilt-soft: rgba(226, 187, 104, .22);
+  --jdr-hp: #ff6b70;
+  --jdr-stamina: #ffa24d;
+  --jdr-ok: #7fd59a;
+  --jdr-shadow: rgba(0, 0, 0, .7);
+  --jbm-window: radial-gradient(120% 80% at 50% 0%, #121a30, #070b16);
+  --jdr-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
+  --jdr-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+body.jbm-light .jbm-ui,
+body.jbm-light .application.jbm-app {
+  --jdr-vellum: #f6f1e6;
+  --jdr-paper-2: #f1eadb;
+  --jdr-field: #fffaf0;
+  --jdr-chip: #efe6d4;
+  --jdr-track: #e5dccb;
+  --jdr-ink: #2a221d;
+  --jdr-ink-soft: #6b5d52;
+  --jdr-rule: #cdbfa6;
+  --jdr-row-rule: rgba(205, 191, 166, .55);
+  --jdr-bordeaux: #7d1f24;
+  --jdr-btn: #7d1f24;
+  --jdr-btn-hover: #5c1519;
+  --jdr-gilt: #a8823a;
+  --jdr-gilt-soft: rgba(168, 130, 58, .3);
+  --jdr-hp: #c0262d;
+  --jdr-stamina: #d9730d;
+  --jdr-ok: #3f7d3a;
+  --jdr-shadow: rgba(42, 34, 29, .45);
+  --jbm-window: radial-gradient(120% 70% at 50% 0%, #f3ede0, #e6dcc8);
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------- éléments communs */
+.jbm-ui,
+.application.jbm-app .window-content {
+  font-family: var(--jdr-body);
+  font-size: 14px;
+  color: var(--jdr-ink);
+}
+.jbm-ui[hidden],
+.jbm-widget [hidden],
+.jbm-app [hidden] { display: none !important; }
+
+/* Foundry stylise fortement les boutons : on repart de zéro. :where() garde cette remise à zéro sous nos classes
+   (le CSS de Foundry est en couches @layer, celui du module passe donc devant de toute façon). */
+:where(.jbm-ui, .jbm-app .window-content) button {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-family: var(--jdr-body);
+}
+:where(.jbm-ui, .jbm-app .window-content) button:focus-visible { outline: 2px solid var(--jdr-gilt); outline-offset: 1px; }
+.jbm-ui input[type="range"],
+.application.jbm-app input[type="range"] { accent-color: var(--jdr-gilt); background: none; border: 0; height: auto; margin: 0; padding: 0; }
+
+.jbm-ibtn {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: inline-grid !important; place-items: center; flex: 0 0 auto;
+  color: var(--jdr-ink); font-size: 14px; position: relative;
+}
+.jbm-ibtn:hover { background: var(--jdr-chip); }
+.jbm-ibtn.jbm-sm { width: 26px; height: 26px; font-size: 12.5px; }
+.jbm-ibtn.jbm-del:hover { color: var(--jdr-hp); }
+.jbm-ibtn.jbm-big { width: 44px; height: 44px; font-size: 18px; background: var(--jdr-btn); color: var(--jdr-btn-ink); }
+.jbm-ibtn.jbm-big:hover { background: var(--jdr-btn-hover); }
+.jbm-btn {
+  display: inline-flex !important; align-items: center; gap: 6px; white-space: nowrap;
+  border: 1px solid var(--jdr-rule); background: var(--jdr-field); color: var(--jdr-ink);
+  border-radius: 6px; padding: 5px 10px; font-weight: 700; font-size: 13.5px; line-height: 1.3;
+}
+.jbm-btn:hover { border-color: var(--jdr-gilt); }
+.jbm-btn.jbm-sm { padding: 3px 8px; font-size: 13px; }
+.jbm-btn.jbm-primary { background: var(--jdr-btn); border-color: var(--jdr-btn); color: var(--jdr-btn-ink); }
+.jbm-btn.jbm-primary:hover { background: var(--jdr-btn-hover); }
+.jbm-btn.jbm-danger { color: var(--jdr-hp); }
+.jbm-btn:disabled { opacity: .5; cursor: default; }
+.jbm-one { position: absolute; font: 800 8.5px var(--jdr-body); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.jbm-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--fc, var(--jdr-gilt)); flex: 0 0 auto; vertical-align: 0; }
+.jbm-state { color: var(--jdr-ok); }
+.jbm-state.is-paused { color: var(--jdr-stamina); }
+.jbm-state.is-off { color: var(--jdr-ink-soft); }
+.jbm-sp { flex: 1; }
+.jbm-muted { color: var(--jdr-ink-soft); font-weight: 500 !important; }
+
+/* ------------------------------------------------------------------ widget */
+.jbm-widget {
+  position: fixed;
+  top: 12px;
+  right: 330px;
+  z-index: var(--z-index-ui, 60);
+  width: 280px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "vid info btns" "ctl ctl ctl" "vol vol vol" "more more more";
+  column-gap: 8px;
+  padding: 7px 7px 4px;
+  background: linear-gradient(180deg, var(--jdr-vellum), var(--jdr-paper-2));
+  border: 1px solid var(--jdr-gilt);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px var(--jdr-shadow), inset 0 0 0 3px var(--jdr-vellum), inset 0 0 0 4px var(--jdr-gilt-soft);
+  user-select: none;
+  pointer-events: auto;
+}
+.jbm-widget.is-dragging { cursor: grabbing; opacity: .92; }
+.jbm-w-vid { grid-area: vid; align-self: center; width: 64px; aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; background: #000; }
+/* Pas de clic dans la vidéo : un clic la mettrait en pause chez ce joueur seulement. */
+.jbm-w-vid iframe { display: block; width: 100%; height: 100%; border: 0; pointer-events: none; }
+.jbm-w-info { grid-area: info; min-width: 0; align-self: center; cursor: grab; }
+.jbm-w-k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--jdr-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; }
+/* Titre en entier, sur plusieurs lignes si besoin : les joueurs doivent savoir ce qui passe. */
+.jbm-w-title { font-weight: 700; font-size: 13.5px; line-height: 1.25; color: var(--jdr-bordeaux); overflow-wrap: anywhere; }
+.jbm-w-btns { grid-area: btns; display: flex; align-items: center; }
+.jbm-w-ctl { grid-area: ctl; display: flex; justify-content: center; align-items: center; gap: 2px; padding-top: 4px; }
+.jbm-w-ctl .jbm-ibtn { width: 28px; height: 28px; font-size: 13px; }
+.jbm-w-ctl .jbm-main { background: var(--jdr-btn); color: var(--jdr-btn-ink); }
+.jbm-w-ctl .jbm-main:hover { background: var(--jdr-btn-hover); }
+.jbm-w-vol { grid-area: vol; display: flex; align-items: center; gap: 6px; }
+.jbm-w-vol input { flex: 1; min-width: 0; }
+.jbm-w-v { width: 26px; text-align: right; font-size: 12px; color: var(--jdr-ink-soft); font-variant-numeric: tabular-nums; }
+.jbm-w-more { grid-area: more; display: none; gap: 8px; border-top: 1px solid var(--jdr-row-rule); margin-top: 4px; padding: 8px 3px 5px; }
+.jbm-opt { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.jbm-opt small { display: block; color: var(--jdr-ink-soft); font-size: 11.5px; line-height: 1.3; }
+.jbm-w-icon { display: none !important; }
+
+/* Déplié : grande vidéo sous le titre. */
+.jbm-widget.is-open { grid-template-areas: "info info btns" "vid vid vid" "ctl ctl ctl" "vol vol vol" "more more more"; }
+.jbm-widget.is-open .jbm-w-vid { width: auto; margin: 6px 0 2px; border-radius: 6px; }
+.jbm-widget.is-open .jbm-w-more { display: grid; }
+/* Sans vidéo (masquée, rien en cours) ou réduit : le lecteur reste dans la page mais devient invisible. */
+.jbm-widget.no-video .jbm-w-vid,
+.jbm-widget.is-mini .jbm-w-vid { position: absolute; width: 1px !important; height: 1px !important; opacity: 0; pointer-events: none; margin: 0; }
+.jbm-widget.no-video:not(.is-open) .jbm-w-info { padding-left: 4px; }
+/* Réduit à une icône. */
+.jbm-widget.is-mini { width: auto; display: block; padding: 0; border-radius: 50%; }
+.jbm-widget.is-mini > :not(.jbm-w-icon):not(.jbm-w-vid) { display: none; }
+.jbm-widget.is-mini .jbm-w-icon {
+  display: grid !important; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  color: var(--jdr-ink-soft); font-size: 16px; cursor: grab;
+}
+.jbm-widget.is-mini.is-playing .jbm-w-icon { color: var(--jdr-gilt); }
+/* Son ciblé en cours (widget du MJ) : liseré orange, bouton « revenir à tout le monde » mis en avant. */
+.jbm-widget.is-targeted { border-color: var(--jdr-stamina); }
+.jbm-w-back { color: var(--jdr-stamina) !important; }
+.jbm-widget.is-mini.is-playing .jbm-w-icon i { animation: jbm-pulse 1.6s ease-in-out infinite; }
+@keyframes jbm-pulse { 50% { transform: scale(1.18); } }
+
+.jbm-banner {
+  position: fixed; left: 50%; top: 12px; transform: translateX(-50%); z-index: calc(var(--z-index-ui, 60) + 1);
+  display: flex; align-items: center; gap: 10px; white-space: nowrap;
+  background: var(--jdr-btn); color: #fff; border-radius: 99px; padding: 6px 8px 6px 14px;
+  font-weight: 700; font-size: 13.5px; box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+}
+.jbm-banner button { background: #fff; color: var(--jdr-btn); border-radius: 99px; padding: 3px 12px; font-weight: 800; }
+
+/* ------------------------------------------------------------ menus, annonce */
+.jbm-menu {
+  position: fixed; z-index: 10000; min-width: 210px; max-height: 70vh; overflow-y: auto;
+  background: var(--jdr-vellum); border: 1px solid var(--jdr-gilt); border-radius: 6px;
+  box-shadow: 0 6px 18px var(--jdr-shadow); padding: 4px;
+}
+.jbm-mi { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.jbm-mi > i { width: 14px; text-align: center; color: var(--jdr-ink-soft); }
+.jbm-mi:hover { background: var(--jdr-chip); }
+.jbm-mi.is-off { opacity: .45; cursor: default; background: none; }
+.jbm-mi.jbm-danger, .jbm-mi.jbm-danger > i { color: var(--jdr-hp); }
+.jbm-mh { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--jdr-ink-soft); font-weight: 700; padding: 5px 10px 2px; }
+.jbm-menu hr { border: 0; border-top: 1px solid var(--jdr-row-rule); margin: 3px 0; }
+.jbm-swatches { display: grid; grid-template-columns: repeat(5, 22px); gap: 6px; padding: 4px 10px 8px; }
+.jbm-sw { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; box-shadow: inset 0 0 0 2px var(--jdr-vellum); box-sizing: border-box; }
+.jbm-sw.is-on { border-color: var(--jdr-ink); }
+.jbm-toast {
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 10000;
+  display: flex; align-items: center; gap: 14px;
+  background: var(--jdr-paper-2); color: var(--jdr-ink); border: 1px solid var(--jdr-gilt); border-radius: 8px;
+  padding: 8px 10px 8px 14px; box-shadow: 0 8px 22px var(--jdr-shadow);
+}
+.jbm-toast button { border: 1px solid var(--jdr-gilt); color: var(--jdr-gilt); border-radius: 6px; padding: 2px 10px; font-weight: 800; }
+
+/* --------------------------------------------------------- fenêtres du MJ */
+.application.jbm-app .window-content { padding: 0; overflow: hidden; background: var(--jbm-window); }
+.jbm-thumb { flex: 0 0 auto; width: 48px; height: 27px; border-radius: 4px; object-fit: cover; background: var(--jdr-chip); border: 0; }
+
+.jbm-lib { display: flex; flex-direction: column; height: 100%; }
+.jbm-now {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center;
+  padding: 12px 14px; background: linear-gradient(180deg, var(--jdr-vellum), var(--jdr-paper-2)); border-bottom: 1px solid var(--jdr-rule);
+}
+.jbm-now-thumb { width: 104px; height: 58px; border-radius: 6px; background: var(--jdr-chip) center / cover no-repeat; }
+.jbm-now-lbl { font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--jdr-ink-soft); display: flex; align-items: center; gap: 6px; }
+.jbm-now-title { font: 700 18px var(--jdr-display); color: var(--jdr-bordeaux); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jbm-prog { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 12px; color: var(--jdr-ink-soft); font-variant-numeric: tabular-nums; }
+.jbm-bar { flex: 1; height: 6px; border-radius: 99px; background: var(--jdr-track); position: relative; cursor: pointer; }
+.jbm-bar span { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: var(--jdr-gilt); pointer-events: none; }
+.jbm-ctrls { display: grid; gap: 8px; justify-items: end; }
+.jbm-ctrls-row { display: flex; align-items: center; gap: 4px; }
+.jbm-vsep { width: 1px; height: 26px; background: var(--jdr-rule); margin: 0 6px; }
+.jbm-vol { display: inline-flex; align-items: center; gap: 6px; color: var(--jdr-ink-soft); }
+.jbm-vol input { width: 84px; }
+.jbm-seg { display: inline-flex; border: 1px solid var(--jdr-rule); border-radius: 7px; overflow: hidden; background: var(--jdr-field); }
+.jbm-seg button { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; color: var(--jdr-ink-soft); font-weight: 700; font-size: 12.5px; position: relative; }
+.jbm-seg button + button { border-left: 1px solid var(--jdr-rule); }
+.jbm-seg button:hover { color: var(--jdr-ink); }
+.jbm-seg button.is-on { background: var(--jdr-btn); color: var(--jdr-btn-ink); }
+.jbm-seg .jbm-one { left: 16px; }
+
+.jbm-tools { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid var(--jdr-row-rule); }
+.jbm-search { flex: 1; display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; background: var(--jdr-field); border: 1px solid var(--jdr-rule); border-radius: 6px; }
+.jbm-search i { color: var(--jdr-ink-soft); font-size: 13px; }
+.jbm-app .jbm-search input { flex: 1; min-width: 0; height: auto; border: 0; background: transparent; box-shadow: none; outline: 0; padding: 0; color: var(--jdr-ink); font: 400 14px var(--jdr-body); }
+
+.jbm-body { flex: 1; display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 0; }
+
+/* Son ciblé : bandeau quand il est en cours, et choix « Qui entend ? » pour le prochain lancement. */
+.jbm-target {
+  display: flex; align-items: center; gap: 10px; padding: 7px 14px; font-weight: 600;
+  background: color-mix(in srgb, var(--jdr-stamina) 15%, var(--jdr-paper-2)); border-bottom: 1px solid var(--jdr-stamina);
+}
+.jbm-target i, .jbm-target b { color: var(--jdr-stamina); }
+.jbm-target-next { color: var(--jdr-ink-soft); font-weight: 500; }
+.jbm-audience { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; padding: 6px 14px; border-bottom: 1px solid var(--jdr-row-rule); font-size: 13px; }
+.jbm-aud-lbl { color: var(--jdr-ink-soft); font-weight: 700; }
+.jbm-aud-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.jbm-aud {
+  display: inline-flex !important; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 99px;
+  border: 1px solid var(--jdr-rule); background: var(--jdr-field); color: var(--jdr-ink-soft); font-weight: 700; font-size: 12.5px;
+}
+.jbm-aud:hover { border-color: var(--jdr-gilt); color: var(--jdr-ink); }
+.jbm-aud.is-on { background: var(--jdr-btn); border-color: var(--jdr-btn); color: var(--jdr-btn-ink); }
+.jbm-aud.is-away { opacity: .6; font-style: italic; }
+.jbm-aud-hint { color: var(--jdr-stamina); font-size: 12.5px; font-weight: 600; }
+.jbm-chip .fa-crosshairs { color: var(--jdr-stamina); }
+.jbm-eq .jbm-general { color: var(--jdr-ink-soft); }
+.jbm-folders { display: flex; flex-direction: column; gap: 2px; padding: 8px; overflow-y: auto; border-right: 1px solid var(--jdr-row-rule); }
+.jbm-folder {
+  display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 6px; border-radius: 6px; cursor: pointer;
+  font-weight: 700; border: 1px solid transparent; border-left: 3px solid transparent;
+}
+.jbm-folder:hover { background: var(--jdr-chip); }
+.jbm-folder.is-sel { background: var(--jdr-field); border-color: var(--jdr-rule); border-left-color: var(--fc); }
+.jbm-folder.is-drop { border-color: var(--fc); background: var(--jdr-gilt-soft); }
+.jbm-fi { width: 16px; text-align: center; color: var(--fc); }
+.jbm-nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jbm-ct { font-size: 12px; color: var(--jdr-ink-soft); font-weight: 500; min-width: 1.4em; text-align: right; }
+.jbm-playing { color: var(--jdr-ok); font-size: 11px; }
+.jbm-fm { opacity: 0; }
+.jbm-folder:hover .jbm-fm, .jbm-folder.is-sel .jbm-fm { opacity: 1; }
+.jbm-add-folder { --fc: var(--jdr-ink-soft); margin-top: 6px; padding: 6px 8px; color: var(--jdr-ink-soft); font-weight: 500; border: 1px dashed var(--jdr-rule); }
+
+.jbm-tracks { overflow-y: auto; padding: 8px 10px; min-height: 0; outline: 0; }
+.jbm-thead { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 2px 4px 8px; }
+.jbm-thead h3 { margin: 0; border: 0; display: flex; align-items: center; gap: 8px; font: 700 16px var(--jdr-display); color: var(--fc, var(--jdr-bordeaux)); }
+.jbm-sub { font-size: 12.5px; color: var(--jdr-ink-soft); }
+.jbm-selbar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 5px 6px 5px 10px; border-radius: 6px; background: var(--jdr-gilt-soft); border: 1px solid var(--jdr-gilt); font-weight: 700; }
+.jbm-track { display: flex; align-items: center; gap: 10px; padding: 4px 6px; border: 1px solid transparent; border-radius: 6px; user-select: none; }
+.jbm-track + .jbm-track { border-top-color: var(--jdr-row-rule); border-radius: 0; }
+.jbm-track:hover { background: var(--jdr-chip); border-radius: 6px; }
+.jbm-track.is-picked { background: var(--jdr-gilt-soft); border-color: transparent; border-radius: 6px; }
+.jbm-track.is-cur { background: var(--jdr-field); border-color: var(--jdr-gilt); border-radius: 6px; }
+.jbm-track.is-cur.is-picked { background: var(--jdr-gilt-soft); }
+.jbm-track.is-dragging { opacity: .4; }
+.jbm-track.is-dropline { box-shadow: 0 -2px 0 var(--jdr-gilt); }
+.jbm-grip { width: 12px; color: var(--jdr-rule); cursor: grab; font-size: 12px; }
+.jbm-track:hover .jbm-grip { color: var(--jdr-ink-soft); }
+.jbm-eq { width: 16px; text-align: center; color: var(--jdr-ok); }
+.jbm-t { flex: 1; min-width: 0; }
+.jbm-n { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jbm-track.is-cur .jbm-n { color: var(--jdr-bordeaux); }
+.jbm-f { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--jdr-ink-soft); }
+.jbm-d { font-size: 12.5px; color: var(--jdr-ink-soft); font-variant-numeric: tabular-nums; }
+.jbm-acts { display: flex; opacity: 0; }
+.jbm-track:hover .jbm-acts, .jbm-track.is-cur .jbm-acts { opacity: 1; }
+.jbm-empty { text-align: center; color: var(--jdr-ink-soft); padding: 30px 10px; }
+
+.jbm-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 7px 14px; border-top: 1px solid var(--jdr-row-rule); background: var(--jdr-paper-2); font-size: 12.5px; color: var(--jdr-ink-soft); }
+.jbm-who { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.jbm-chip { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 99px; background: var(--jdr-chip); color: var(--jdr-ink); font-weight: 700; }
+.jbm-chip i { font-size: 9px; color: var(--jdr-ok); }
+.jbm-chip.is-warn i { color: var(--jdr-stamina); }
+.jbm-chip.is-off i, .jbm-chip.is-unknown i { color: var(--jdr-ink-soft); }
+.jbm-chip.is-unknown { opacity: .7; }
+
+/* ---------------------------------------------------------- ajout par lot */
+.application.jbm-add-app .window-content { overflow-y: auto; }
+.jbm-add { display: grid; gap: 10px; padding: 12px 14px; }
+.jbm-app textarea.jbm-paste {
+  width: 100%; min-height: 110px; resize: vertical; box-sizing: border-box; padding: 10px;
+  background: var(--jdr-field); color: var(--jdr-ink); border: 1.5px dashed var(--jdr-rule); border-radius: 8px;
+  font: 400 13.5px/1.5 var(--jdr-body); outline: 0;
+}
+.jbm-app textarea.jbm-paste:focus { border-color: var(--jdr-gilt); box-shadow: none; }
+.jbm-hint { font-size: 12.5px; color: var(--jdr-ink-soft); }
+.jbm-found { max-height: 300px; overflow-y: auto; background: var(--jdr-vellum); border: 1px solid var(--jdr-rule); border-radius: 8px; }
+.jbm-frow { display: flex; align-items: center; gap: 10px; padding: 5px 10px; }
+.jbm-frow + .jbm-frow { border-top: 1px solid var(--jdr-row-rule); }
+.jbm-frow.jbm-sub { padding-left: 34px; font-size: 13px; }
+.jbm-frow .jbm-thumb { width: 44px; height: 25px; }
+.jbm-frow .jbm-n { flex: 1; min-width: 0; }
+.jbm-plicon { width: 44px; height: 25px; border-radius: 4px; display: grid; place-items: center; background: var(--jdr-gilt-soft); color: var(--jdr-gilt); }
+.jbm-app input.jbm-title-in {
+  width: 100%; height: auto; box-sizing: border-box; padding: 1px 4px; border: 1px solid transparent; border-radius: 4px;
+  background: transparent; color: var(--jdr-ink); font: 700 14px var(--jdr-body); box-shadow: none;
+}
+.jbm-app input.jbm-title-in:hover, .jbm-app input.jbm-title-in:focus { border-color: var(--jdr-rule); background: var(--jdr-field); outline: 0; }
+.jbm-badge { font-size: 11.5px; font-weight: 800; border-radius: 99px; padding: 1px 8px; white-space: nowrap; }
+.jbm-badge.is-ok { color: var(--jdr-ok); background: color-mix(in srgb, var(--jdr-ok) 14%, transparent); }
+.jbm-badge.is-dup { color: var(--jdr-stamina); background: color-mix(in srgb, var(--jdr-stamina) 14%, transparent); }
+.jbm-badge.is-pl { color: var(--jdr-gilt); background: var(--jdr-gilt-soft); }
+.jbm-badge.is-bad { color: var(--jdr-hp); background: color-mix(in srgb, var(--jdr-hp) 12%, transparent); }
+.jbm-dest { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.jbm-app .jbm-dest select,
+.jbm-app .jbm-dest input {
+  width: auto; height: auto; padding: 5px 8px; border: 1px solid var(--jdr-rule); border-radius: 6px;
+  background: var(--jdr-field); color: var(--jdr-ink); font: 700 14px var(--jdr-body);
+}
+.jbm-app .jbm-dest select option { background: var(--jdr-field); color: var(--jdr-ink); }
+
+@media (max-width: 900px) {
+  .jbm-now { grid-template-columns: auto minmax(0, 1fr); }
+  .jbm-ctrls { grid-column: 1 / -1; justify-items: start; }
+}

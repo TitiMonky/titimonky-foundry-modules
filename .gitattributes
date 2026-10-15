@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.wav binary
+*.png binary
+*.apng binary
+*.webm binary
+*.svg text
