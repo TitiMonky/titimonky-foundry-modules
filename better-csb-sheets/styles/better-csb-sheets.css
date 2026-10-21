@@ -13,7 +13,7 @@ body.bcs-on {
   --bcs-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
   --bcs-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
 
-  /* Parchemin (par défaut) : vélin et bordeaux le jour, bleu nuit et or la nuit */
+  /* Parchemin (par défaut) : vélin et bordeaux le jour ; la nuit, quasi-noir à sous-ton bleu et or (Nuit profonde) */
   --bcs-l-bg: #f6f1e6;  --bcs-l-bg2: #f1eadb;  --bcs-l-win: #ebe5d8;  --bcs-l-head: #e3dac6;
   --bcs-l-field: #fffaf0;  --bcs-l-solid: #fff;  --bcs-l-chip: #efe6d4;  --bcs-l-track: #e5dccb;
   --bcs-l-ink: #2a221d;  --bcs-l-soft: #6b5d52;  --bcs-l-rule: #cdbfa6;
@@ -21,12 +21,12 @@ body.bcs-on {
   --bcs-l-gilt: #a8823a;  --bcs-l-red: #c0262d;  --bcs-l-green: #3f7d3a;  --bcs-l-blue: #1f5fd1;  --bcs-l-orange: #d9730d;
   --bcs-l-chat: #f8f4ea;  --bcs-l-shadow: rgba(42, 34, 29, .45);
 
-  --bcs-d-bg: #141b2d;  --bcs-d-bg2: #10162a;  --bcs-d-win: radial-gradient(120% 80% at 50% 0%, #121a30, #070b16);  --bcs-d-head: #05080f;
-  --bcs-d-field: #0c1222;  --bcs-d-solid: #080d1a;  --bcs-d-chip: #1c2540;  --bcs-d-track: #1c2540;
-  --bcs-d-ink: #e7eaf3;  --bcs-d-soft: #97a2bf;  --bcs-d-rule: #2a3556;
-  --bcs-d-accent: #e2bb68;  --bcs-d-accent2: #c99f4c;  --bcs-d-btn: #a3263a;  --bcs-d-btn-hover: #bd3047;  --bcs-d-btn-ink: #fff;
-  --bcs-d-gilt: #e2bb68;  --bcs-d-red: #ff6b70;  --bcs-d-green: #7fd59a;  --bcs-d-blue: #6fa4ff;  --bcs-d-orange: #ffa24d;
-  --bcs-d-chat: #161e33;  --bcs-d-shadow: rgba(0, 0, 0, .7);
+  --bcs-d-bg: #12151c;  --bcs-d-bg2: #0f1218;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #111622, #06080b 70%);  --bcs-d-head: #030405;
+  --bcs-d-field: #1a1e28;  --bcs-d-solid: #060709;  --bcs-d-chip: #242a36;  --bcs-d-track: #090b0f;
+  --bcs-d-ink: #eaedf4;  --bcs-d-soft: #a4acbe;  --bcs-d-rule: #333b4c;
+  --bcs-d-accent: #e6bf6d;  --bcs-d-accent2: #cfa553;  --bcs-d-btn: #a3263a;  --bcs-d-btn-hover: #bd3047;  --bcs-d-btn-ink: #fff;
+  --bcs-d-gilt: #d9b264;  --bcs-d-red: #ff7070;  --bcs-d-green: #85d6a0;  --bcs-d-blue: #79abff;  --bcs-d-orange: #ffa955;
+  --bcs-d-chat: #14171f;  --bcs-d-shadow: rgba(0, 0, 0, .85);
 }
 /* Ardoise : gris bleuté et bleu, sobre */
 body.bcs-on.bcs-pal-ardoise {
@@ -37,9 +37,9 @@ body.bcs-on.bcs-pal-ardoise {
   --bcs-l-gilt: #2b7a78;  --bcs-l-red: #c0392b;  --bcs-l-green: #2e7d4f;  --bcs-l-blue: #2f6fd6;  --bcs-l-orange: #c96a12;
   --bcs-l-chat: #f9fafb;  --bcs-l-shadow: rgba(20, 25, 35, .35);
 
-  --bcs-d-bg: #1d2129;  --bcs-d-bg2: #191c23;  --bcs-d-win: linear-gradient(#1c2027, #13161b);  --bcs-d-head: #101216;
-  --bcs-d-field: #14171d;  --bcs-d-solid: #0f1115;  --bcs-d-chip: #262b35;  --bcs-d-track: #262b35;
-  --bcs-d-ink: #e6e9ef;  --bcs-d-soft: #9aa3b2;  --bcs-d-rule: #343a46;
+  --bcs-d-bg: #16181d;  --bcs-d-bg2: #121418;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #181b21, #08090b 70%);  --bcs-d-head: #050607;
+  --bcs-d-field: #1f232b;  --bcs-d-solid: #08090b;  --bcs-d-chip: #2a2f39;  --bcs-d-track: #0b0c0f;
+  --bcs-d-ink: #e8ebf0;  --bcs-d-soft: #a3abb9;  --bcs-d-rule: #363c48;
   --bcs-d-accent: #8fb4ff;  --bcs-d-accent2: #6f98ea;  --bcs-d-btn: #3d63a8;  --bcs-d-btn-hover: #4a74bd;  --bcs-d-btn-ink: #fff;
   --bcs-d-gilt: #6fc3bf;  --bcs-d-red: #ff7b72;  --bcs-d-green: #7ee2a0;  --bcs-d-blue: #79a8ff;  --bcs-d-orange: #ffab5e;
   --bcs-d-chat: #1f232b;  --bcs-d-shadow: rgba(0, 0, 0, .6);
@@ -53,9 +53,9 @@ body.bcs-on.bcs-pal-foret {
   --bcs-l-gilt: #8a6a2f;  --bcs-l-red: #b3362c;  --bcs-l-green: #3d7a3a;  --bcs-l-blue: #2d5f9a;  --bcs-l-orange: #b8650f;
   --bcs-l-chat: #f5f3ea;  --bcs-l-shadow: rgba(30, 35, 25, .4);
 
-  --bcs-d-bg: #171c16;  --bcs-d-bg2: #131712;  --bcs-d-win: radial-gradient(120% 80% at 50% 0%, #1b2219, #0b0e0a);  --bcs-d-head: #090b08;
-  --bcs-d-field: #10140f;  --bcs-d-solid: #0b0e0a;  --bcs-d-chip: #222a20;  --bcs-d-track: #222a20;
-  --bcs-d-ink: #e6eadf;  --bcs-d-soft: #a0aa94;  --bcs-d-rule: #333d30;
+  --bcs-d-bg: #141812;  --bcs-d-bg2: #10130f;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #171d15, #070906 70%);  --bcs-d-head: #040503;
+  --bcs-d-field: #1d231b;  --bcs-d-solid: #070906;  --bcs-d-chip: #283024;  --bcs-d-track: #0a0c09;
+  --bcs-d-ink: #e8ece1;  --bcs-d-soft: #a8b29c;  --bcs-d-rule: #364032;
   --bcs-d-accent: #b5d68f;  --bcs-d-accent2: #98bd72;  --bcs-d-btn: #4f7a3a;  --bcs-d-btn-hover: #5d8b46;  --bcs-d-btn-ink: #fff;
   --bcs-d-gilt: #d4b06a;  --bcs-d-red: #ff7a6b;  --bcs-d-green: #9fdc8a;  --bcs-d-blue: #7fb0e8;  --bcs-d-orange: #f0a250;
   --bcs-d-chat: #1a2018;  --bcs-d-shadow: rgba(0, 0, 0, .65);
@@ -74,6 +74,7 @@ body.bcs-on.bcs-auto .theme-light {
   --bcs-btn: var(--bcs-l-btn);  --bcs-btn-hover: var(--bcs-l-btn-hover);  --bcs-btn-ink: var(--bcs-l-btn-ink);
   --bcs-gilt: var(--bcs-l-gilt);  --bcs-red: var(--bcs-l-red);  --bcs-green: var(--bcs-l-green);  --bcs-blue: var(--bcs-l-blue);  --bcs-orange: var(--bcs-l-orange);
   --bcs-chat: var(--bcs-l-chat);  --bcs-shadow: var(--bcs-l-shadow);
+  --bcs-grain: none;  --bcs-grain-card: none;  --bcs-lift: inset 0 0 0 transparent;
   --bcs-row: color-mix(in srgb, var(--bcs-rule) 55%, transparent);
   --bcs-zebra: color-mix(in srgb, var(--bcs-chip) 45%, transparent);
   --bcs-hover: color-mix(in srgb, var(--bcs-accent) 6%, transparent);
@@ -94,6 +95,10 @@ body.bcs-on.bcs-auto #interface.theme-dark .chat-message {
   --bcs-btn: var(--bcs-d-btn);  --bcs-btn-hover: var(--bcs-d-btn-hover);  --bcs-btn-ink: var(--bcs-d-btn-ink);
   --bcs-gilt: var(--bcs-d-gilt);  --bcs-red: var(--bcs-d-red);  --bcs-green: var(--bcs-d-green);  --bcs-blue: var(--bcs-d-blue);  --bcs-orange: var(--bcs-d-orange);
   --bcs-chat: var(--bcs-d-chat);  --bcs-shadow: var(--bcs-d-shadow);
+  /* Grain fin (bruit SVG) sur le fond des fenêtres et les cartes, reflet en haut des cartes */
+  --bcs-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .16 0 0 0 -.064'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bcs-grain-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .09 0 0 0 -.036'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bcs-lift: inset 0 1px 0 rgba(255, 255, 255, .045);
   --bcs-row: color-mix(in srgb, var(--bcs-rule) 80%, transparent);
   --bcs-zebra: color-mix(in srgb, var(--bcs-ink) 4%, transparent);
   --bcs-hover: color-mix(in srgb, var(--bcs-accent) 8%, transparent);
@@ -119,13 +124,13 @@ body.bcs-on .application.custom-dialog {
   & .window-header :is(.window-title, button, a) { color: var(--bcs-ink); }
   & .window-header .window-title { font: 700 15px var(--bcs-display); letter-spacing: .03em; }
   /* Taille de base lisible : certains templates descendent à 11 px pour toute la fiche */
-  & .window-content { background: var(--bcs-win); color: var(--bcs-ink); font-size: 13px; }
+  & .window-content { background: var(--bcs-grain), var(--bcs-win); color: var(--bcs-ink); font-size: 13px; }
 }
 body.bcs-on:is(.bcs-dark, .bcs-auto.theme-dark) .application:is(.custom-system, .custom-dialog),
 body.bcs-on.bcs-auto .application.theme-dark:is(.custom-system, .custom-dialog) { color-scheme: dark; }
 body.bcs-on .application.custom-dialog .window-content { background: linear-gradient(var(--bcs-bg), var(--bcs-bg2)); }
 body.bcs-on:is(.bcs-dark, .bcs-auto.theme-dark) .application.custom-dialog .window-content,
-body.bcs-on.bcs-auto .application.custom-dialog.theme-dark .window-content { background: var(--bcs-win); }
+body.bcs-on.bcs-auto .application.custom-dialog.theme-dark .window-content { background: var(--bcs-grain), var(--bcs-win); }
 
 /* ---------------------------------------------------------------- en-tête de fiche (portrait, nom, en-tête du template) */
 body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, ._equippableItemTemplate, .subTemplate, .userInputTemplate) {
@@ -134,10 +139,10 @@ body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, .
     gap: 16px;
     margin-bottom: 10px;
     padding: 12px 14px;
-    background: linear-gradient(var(--bcs-bg), var(--bcs-bg2));
+    background: var(--bcs-grain-card), linear-gradient(var(--bcs-bg), var(--bcs-bg2));
     border: 1px solid var(--bcs-rule);
     border-radius: 8px;
-    box-shadow: 0 6px 18px -10px var(--bcs-shadow);
+    box-shadow: var(--bcs-lift), 0 6px 18px -10px var(--bcs-shadow);
   }
   /* Portrait : cadre fixe, l'image le remplit quelle que soit sa forme */
   & .profile-img-container {
@@ -428,10 +433,10 @@ body.bcs-on .application.custom-dialog {
    Chat : tous les messages (texte, jets /r, chuchotements, messages des fiches CSB)
    ===================================================================== */
 body.bcs-on .chat-message {
-  background: linear-gradient(var(--bcs-chat), var(--bcs-bg2)) !important;
+  background: var(--bcs-grain-card), linear-gradient(var(--bcs-chat), var(--bcs-bg2)) !important;
   border: 1px solid var(--bcs-rule) !important;
   border-radius: 8px;
-  box-shadow: 0 3px 8px -5px rgba(0, 0, 0, .45);
+  box-shadow: var(--bcs-lift), 0 3px 8px -5px rgba(0, 0, 0, .45);
   color: var(--bcs-ink);
 
   & .message-header, & .message-header *:not(i):not([class*="fa-"]) { font-family: var(--bcs-body); }
