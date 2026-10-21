@@ -8,7 +8,7 @@
       "url": "https://github.com/TitiMonky"
     }
   ],
-  "version": "1.0.3",
+  "version": "1.1.0",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -21,5 +21,5 @@
   ],
   "url": "https://github.com/TitiMonky/titimonky-foundry-modules",
   "manifest": "https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/better-timer/module.json",
-  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/better-timer-v1.0.3/better-timer.zip"
+  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/better-timer-v1.1.0/better-timer.zip"
 }
