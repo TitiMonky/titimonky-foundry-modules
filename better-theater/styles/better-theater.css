@@ -1,5 +1,7 @@
-/* Better Theater : calque des portraits, au-dessus de la carte (z 0), au même niveau que le HUD des jetons (z 1)
-   mais placé avant lui dans la page, donc dessous ; sous les colonnes de l'interface (z 30) et les fenêtres (z 100). */
+/* Better Theater : calque des portraits, au-dessus du HUD des jetons, des colonnes (z 30), des fenêtres et widgets
+   des autres modules (z 100, +1 à chaque fenêtre mise au premier plan). #interface n'a pas de z-index : le calque est
+   comparé directement aux fenêtres. Fiches et dialogues restent devant : le script le découpe là où ils sont.
+   Sous les visites guidées de Foundry, les infobulles (z 9999) et les notifications. */
 #bt-stage {
   --bt-gold: #e2bb68;
   --bt-navy: #0c1222;
@@ -10,7 +12,7 @@
   --bt-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: calc(var(--z-index-tooltip, 9999) - 1000);
   pointer-events: none;
   overflow: hidden;
   transition: opacity .35s;

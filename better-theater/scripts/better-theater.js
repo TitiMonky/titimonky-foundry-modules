@@ -547,6 +547,80 @@ const Stage = {
   }
 };
 
+/* ----------------------------------------------- fiches devant le théâtre */
+
+// Le théâtre passe devant les fenêtres et widgets des autres modules, mais pas devant les fiches ni les dialogues :
+// on le découpe là où ils se trouvent (clip-path troué, qui coupe aussi les clics), comme s'il était dessous.
+const SHEETS = ".application.sheet, .application.dialog, .app.sheet, .app.dialog";
+
+function windowRect(el) {
+  if (!el.isConnected || el.hidden || !(el.checkVisibility?.() ?? true)) return null;
+  const r = el.getBoundingClientRect();
+  return r.width && r.height ? r : null;
+}
+
+// Trous qui se chevauchent : la règle evenodd les rouvrirait. On découpe donc leur réunion en cases disjointes
+// (grille tirée des bords de tous les trous) et on fusionne les cases voisines de chaque rangée.
+function holesPath(rects) {
+  const xs = [...new Set(rects.flatMap(r => [r.left, r.right]))].sort((a, b) => a - b);
+  const ys = [...new Set(rects.flatMap(r => [r.top, r.bottom]))].sort((a, b) => a - b);
+  let d = "";
+  for (let j = 0; j < ys.length - 1; j++) {
+    const y = (ys[j] + ys[j + 1]) / 2;
+    let start = null;
+    for (let i = 0; i < xs.length; i++) {
+      const x = (xs[i] + xs[i + 1]) / 2;
+      const inside = i < xs.length - 1 && rects.some(r => x > r.left && x < r.right && y > r.top && y < r.bottom);
+      if (inside && start === null) start = xs[i];
+      if (!inside && start !== null) {
+        d += `M${start} ${ys[j]}H${xs[i]}V${ys[j + 1]}H${start}Z`;
+        start = null;
+      }
+    }
+  }
+  return d;
+}
+
+const Holes = {
+  frame: 0,
+  watched: new WeakSet(),
+  observer: null,
+
+  start() {
+    // Déplacement, redimensionnement, réduction : Foundry réécrit le style ou les classes de la fenêtre.
+    this.observer = new MutationObserver(() => this.update());
+    // Les fenêtres s'ajoutent et se retirent directement dans <body>.
+    new MutationObserver(() => this.update()).observe(document.body, { childList: true });
+    this.update();
+  },
+
+  update() {
+    if (this.frame) return;
+    this.frame = requestAnimationFrame(() => {
+      this.frame = 0;
+      this.cut();
+    });
+  },
+
+  cut() {
+    const root = Stage.root;
+    if (!root) return;
+    const o = root.getBoundingClientRect();
+    const rects = [];
+    for (const el of document.querySelectorAll(SHEETS)) {
+      if (!this.watched.has(el)) {
+        this.watched.add(el);
+        this.observer.observe(el, { attributes: true, attributeFilter: ["style", "class"] });
+      }
+      const r = windowRect(el);
+      if (r) rects.push({ left: r.left - o.left, right: r.right - o.left, top: r.top - o.top, bottom: r.bottom - o.top });
+    }
+    root.style.clipPath = rects.length
+      ? `path(evenodd, "M0 0H${o.width}V${o.height}H0Z${holesPath(rects)}")`
+      : "";
+  }
+};
+
 /* ---------------------------------------------- boutons près du chat */
 
 function injectControls() {
@@ -647,10 +721,14 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   Stage.build();
+  Holes.start();
   injectControls();
   game.socket.on(SOCKET, onSocket);
 
-  window.addEventListener("resize", () => Stage.render());
+  window.addEventListener("resize", () => {
+    Stage.render();
+    Holes.update();
+  });
   const sidebar = document.getElementById("sidebar");
   if (sidebar) new ResizeObserver(() => Stage.render()).observe(sidebar);
   document.addEventListener("pointerdown", event => {
