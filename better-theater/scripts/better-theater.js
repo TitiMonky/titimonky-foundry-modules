@@ -621,8 +621,10 @@ const Holes = {
   }
 };
 
-/* ---------------------------------------------- boutons près du chat */
+/* ---------------------------------------------- bouton près du chat */
 
+// Un seul bouton : il ouvre un menu (vers le haut, ou sur le côté quand le chat flotte, barre latérale repliée).
+// Pastille sur le bouton quand le théâtre est masqué chez moi ou que le rideau est baissé.
 function injectControls() {
   const controls = document.getElementById("chat-controls");
   if (!controls) return;
@@ -630,34 +632,195 @@ function injectControls() {
   if (!group) {
     group = document.createElement("div");
     group.className = "bt-controls";
-    const b = (act, icon, tip, gmOnly) => (gmOnly && !game.user.isGM) ? "" :
-      `<button type="button" class="ui-control icon ${icon}" data-bt="${act}" data-tooltip="${tip}" aria-label="${tip}"></button>`;
-    group.innerHTML = b("image", "fa-solid fa-image", "Théâtre : ajouter une image", true)
-      + b("curtain", "fa-solid fa-person-booth", "Théâtre : rideau (masquer chez tout le monde)", true)
-      + b("hide", "fa-solid fa-masks-theater", "Théâtre : masquer chez moi (clic droit MJ : vider)");
-    group.addEventListener("click", event => {
-      const act = event.target.closest("[data-bt]")?.dataset.bt;
-      if (act === "image") pickImage();
-      else if (act === "curtain") request("curtain");
-      else if (act === "hide") game.settings.set(ID, "hidden", !setting("hidden"));
-    });
-    group.addEventListener("contextmenu", async event => {
-      if (event.target.closest("[data-bt]")?.dataset.bt !== "hide" || !game.user.isGM) return;
+    group.innerHTML = `<button type="button" class="ui-control icon fa-solid fa-masks-theater" data-bt="menu" aria-expanded="false"></button>`;
+    const button = group.firstElementChild;
+    button.addEventListener("click", () => Panel.toggle(button));
+    // Un acteur glissé depuis l'onglet Acteurs rejoint le théâtre.
+    button.addEventListener("dragover", event => event.preventDefault());
+    button.addEventListener("drop", event => {
       event.preventDefault();
+      const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+      if (data?.type !== "Actor") return;
+      const actor = fromUuidSync(data.uuid);
+      if (!actor?.isOwner) return void ui.notifications.warn("Better Theater : ce personnage ne vous appartient pas.");
+      if (!isStaged(actor)) request("addActor", { actorId: actor.id });
+    });
+    const before = controls.querySelector(".control-buttons");
+    if (before) controls.insertBefore(group, before);
+    else controls.append(group);
+  }
+  const button = group.querySelector('[data-bt="menu"]');
+  const hidden = !!setting("hidden"), curtain = readStage().curtain;
+  const state = [hidden && "masqué chez moi", curtain && "rideau baissé"].filter(Boolean).join(", ");
+  const tip = `Better Theater${state ? ` (${state})` : ""}`;
+  button.classList.toggle("bt-alert", hidden || curtain);
+  button.dataset.tooltip = tip;
+  button.setAttribute("aria-label", tip);
+  Panel.refresh();
+}
+
+// Personnages proposés : ceux dont je suis propriétaire (tous pour le MJ), sans les modèles (type « _template »
+// de Custom System Builder). Mon personnage attitré d'abord, puis ceux des joueurs, puis l'ordre alphabétique.
+function stageableActors() {
+  const mine = game.user.character?.id;
+  const rank = a => (a.id === mine ? 0 : a.hasPlayerOwner ? 1 : 2);
+  return game.actors.filter(a => a.isOwner && !a.type.startsWith("_"))
+    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, "fr"));
+}
+
+const fold = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const LIST_MAX = 50;
+
+const Panel = {
+  el: null,
+  button: null,
+  view: "main",   // « main » ou « actors »
+  query: "",
+  lazy: null,
+
+  toggle(button) {
+    if (this.el) return this.close();
+    this.button = button;
+    this.view = "main";
+    this.query = "";
+    this.el = document.createElement("div");
+    this.el.id = "bt-panel";
+    this.el.addEventListener("click", event => this.onClick(event));
+    this.el.addEventListener("input", event => {
+      if (!event.target.matches(".bt-search")) return;
+      this.query = event.target.value;
+      this.drawList();
+    });
+    document.body.append(this.el);
+    this.button.setAttribute("aria-expanded", "true");
+    this.draw();
+  },
+
+  close() {
+    this.lazy?.disconnect();
+    this.el?.remove();
+    this.button?.setAttribute("aria-expanded", "false");
+    this.el = this.button = this.lazy = null;
+  },
+
+  // Le théâtre a changé (ou le masquage) : on redessine, sans perdre la recherche en cours.
+  refresh() {
+    if (!this.el) return;
+    if (!this.button?.isConnected) return this.close();
+    if (this.view === "actors") this.drawList();
+    else this.draw();
+  },
+
+  item(act, icon, label, { on = false, danger = false, more = false, disabled = false } = {}) {
+    return `<button type="button" class="bt-item${on ? " bt-on" : ""}" data-act="${act}"${danger ? " data-danger" : ""}${disabled ? " disabled" : ""}>`
+      + `<i class="fa-solid ${icon}"></i><span>${label}</span>`
+      + (on ? `<i class="fa-solid fa-check bt-tail"></i>` : more ? `<i class="fa-solid fa-chevron-right bt-tail"></i>` : "")
+      + `</button>`;
+  },
+
+  draw() {
+    this.lazy?.disconnect();
+    const stage = readStage();
+    const hidden = !!setting("hidden");
+    let html;
+    if (this.view === "actors") {
+      const search = game.user.isGM || stageableActors().length > 8;
+      html = `<div class="bt-head"><button type="button" class="bt-back" data-act="back" aria-label="Retour"><i class="fa-solid fa-chevron-left"></i></button>`
+        + `<span>${game.user.isGM ? "Ajouter un personnage" : "Mes personnages"}</span></div>`
+        + (search ? `<input type="search" class="bt-search" placeholder="Rechercher…" value="${esc(this.query)}">` : "")
+        + `<div class="bt-list"></div>`;
+    } else if (game.user.isGM) {
+      html = this.item("image", "fa-image", "Ajouter une image")
+        + this.item("actors", "fa-user-plus", "Ajouter un personnage", { more: true })
+        + this.item("curtain", "fa-person-booth", "Masquer chez tout le monde", { on: stage.curtain })
+        + this.item("hide", "fa-eye-slash", "Masquer chez moi", { on: hidden })
+        + this.item("clear", "fa-trash", "Vider le théâtre", { danger: true, disabled: !stage.entries.length });
+    } else {
+      const mine = stageableActors();
+      const staged = mine.filter(isStaged);
+      html = "";
+      if (mine.length === 1 && !staged.length) html += this.item("add", "fa-user-plus", `Ajouter ${esc(mine[0].name)}`);
+      if (mine.length > 1) html += this.item("actors", "fa-user-plus",
+        staged.length < mine.length ? "Ajouter mon personnage" : "Mes personnages", { more: true });
+      html += this.item("hide", "fa-eye-slash", "Masquer chez moi", { on: hidden });
+      if (staged.length) html += this.item("remove-mine", "fa-user-minus",
+        staged.length > 1 ? `Retirer mes personnages (${staged.length})` : `Retirer ${esc(staged[0].name)}`, { danger: true });
+    }
+    this.el.innerHTML = html;
+    this.el.classList.toggle("bt-wide", this.view === "actors");
+    if (this.view === "actors") this.drawList();
+    this.position();
+    this.el.querySelector(".bt-search")?.focus();
+  },
+
+  drawList() {
+    const list = this.el?.querySelector(".bt-list");
+    if (!list) return;
+    this.lazy?.disconnect();
+    const top = list.scrollTop;   // cocher une ligne redessine la liste : on garde la position
+    const q = fold(this.query.trim());
+    const found = stageableActors().filter(a => !q || fold(a.name).includes(q));
+    const shown = found.slice(0, LIST_MAX);
+    list.innerHTML = shown.map(a => {
+      const on = isStaged(a);
+      return `<button type="button" class="bt-item bt-actor${on ? " bt-on" : ""}" data-act="actor" data-actor="${a.id}">`
+        + `<img alt="" draggable="false"><span>${esc(a.name)}</span>`
+        + `<i class="fa-solid ${on ? "fa-check" : "fa-plus"} bt-tail"></i></button>`;
+    }).join("")
+      + (!found.length ? `<p class="bt-note">Aucun personnage.</p>` : "")
+      + (found.length > LIST_MAX ? `<p class="bt-note">${found.length - LIST_MAX} autres : précisez la recherche.</p>` : "");
+    // Vignettes tirées seulement quand la ligne apparaît : certaines images de fiche sont énormes.
+    this.lazy = new IntersectionObserver(seen => {
+      for (const { isIntersecting, target } of seen) {
+        if (!isIntersecting) continue;
+        this.lazy.unobserve(target);
+        const img = target.querySelector("img");
+        thumbnail(describe({ actorId: target.dataset.actor })?.img ?? FALLBACK_IMG).then(src => { img.src = src; });
+      }
+    }, { root: list });
+    list.querySelectorAll(".bt-actor").forEach(row => this.lazy.observe(row));
+    list.scrollTop = top;
+    this.position();
+  },
+
+  position() {
+    if (!this.el || !this.button) return;
+    const r = this.button.getBoundingClientRect();
+    const w = this.el.offsetWidth, h = this.el.offsetHeight;
+    const side = !!this.button.closest("#chat-notifications");
+    const x = side ? r.left - w - 6 : r.right - w;
+    const y = side ? r.bottom - h : r.top - h - 6;
+    this.el.style.left = `${clamp(x, 8, window.innerWidth - w - 8)}px`;
+    this.el.style.top = `${clamp(y, 8, window.innerHeight - h - 8)}px`;
+  },
+
+  async onClick(event) {
+    const b = event.target.closest("button[data-act]");
+    if (!b || b.disabled) return;
+    const act = b.dataset.act;
+    if (act === "actors" || act === "back") {
+      this.view = act === "actors" ? "actors" : "main";
+      this.query = "";
+      return this.draw();
+    }
+    if (act === "actor") return toggleActor(game.actors.get(b.dataset.actor));
+    if (act === "hide") return game.settings.set(ID, "hidden", !setting("hidden"));
+    if (act === "curtain") return request("curtain");
+    const mine = stageableActors();
+    this.close();
+    if (act === "image") pickImage();
+    else if (act === "add") request("addActor", { actorId: mine[0]?.id });
+    else if (act === "remove-mine") mine.filter(isStaged).forEach(a => request("removeActor", { actorId: a.id }));
+    else if (act === "clear") {
       const ok = await foundry.applications.api.DialogV2.confirm({
         window: { title: "Vider le théâtre" },
         content: "<p>Retirer tous les portraits du théâtre ?</p>",
         rejectClose: false
       });
       if (ok) request("clear");
-    });
-    const before = controls.querySelector(".control-buttons");
-    if (before) controls.insertBefore(group, before);
-    else controls.append(group);
+    }
   }
-  group.querySelector('[data-bt="hide"]')?.setAttribute("aria-pressed", String(!!setting("hidden")));
-  group.querySelector('[data-bt="curtain"]')?.setAttribute("aria-pressed", String(readStage().curtain));
-}
+};
 
 /* ------------------------------------------------------------- bulles */
 
@@ -728,13 +891,19 @@ Hooks.once("ready", () => {
   window.addEventListener("resize", () => {
     Stage.render();
     Holes.update();
+    Panel.close();
   });
   const sidebar = document.getElementById("sidebar");
   if (sidebar) new ResizeObserver(() => Stage.render()).observe(sidebar);
   document.addEventListener("pointerdown", event => {
     if (Stage.menu && !Stage.menu.contains(event.target) && !event.target.closest?.(".bt-pt")) Stage.closeMenu();
+    if (Panel.el && !Panel.el.contains(event.target) && !Panel.button?.contains(event.target)) Panel.close();
   }, true);
-  document.addEventListener("keydown", event => { if (event.key === "Escape") Stage.closeMenu(); });
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    Stage.closeMenu();
+    Panel.close();
+  });
 
   if (isLeadGM()) run("prune", {}, game.user);
 
@@ -755,7 +924,10 @@ Hooks.once("ready", () => {
 });
 
 Hooks.on("renderChatInput", () => injectControls());
-Hooks.on("collapseSidebar", () => setTimeout(() => Stage.render(), 260));
+Hooks.on("collapseSidebar", () => {
+  Panel.close();
+  setTimeout(() => Stage.render(), 260);
+});
 Hooks.on("canvasReady", () => Stage.render());
 Hooks.on("clientSettingChanged", key => { if (key === "core.performanceMode") Stage.render(); });
 Hooks.on("createChatMessage", onChatMessage);

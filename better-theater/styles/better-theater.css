@@ -2,7 +2,8 @@
    des autres modules (z 100, +1 à chaque fenêtre mise au premier plan). #interface n'a pas de z-index : le calque est
    comparé directement aux fenêtres. Fiches et dialogues restent devant : le script le découpe là où ils sont.
    Sous les visites guidées de Foundry, les infobulles (z 9999) et les notifications. */
-#bt-stage {
+#bt-stage,
+#bt-panel {
   --bt-gold: #e2bb68;
   --bt-navy: #0c1222;
   --bt-navy-2: #141b2d;
@@ -10,6 +11,8 @@
   --bt-ink: #e7eaf3;
   --bt-display: "Alegreya SC", "Palatino Linotype", Georgia, serif;
   --bt-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+}
+#bt-stage {
   position: absolute;
   inset: 0;
   z-index: calc(var(--z-index-tooltip, 9999) - 1000);
@@ -204,7 +207,112 @@
 #bt-stage .bt-menu button.bt-on { border-color: var(--bt-gold); color: var(--bt-gold); background: rgba(163, 38, 58, .55); }
 #bt-stage .bt-menu button[data-danger]:hover { border-color: #ff6b70; color: #ff6b70; }
 
-/* ----- boutons dans les commandes du chat ----- */
+/* ----- bouton près du chat et son menu ----- */
 #chat-controls .bt-controls { display: flex; gap: 4px; }
 #chat-notifications #chat-controls .bt-controls { flex-direction: column; margin-top: 8px; }
-#chat-controls .bt-controls [data-bt][aria-pressed="true"] { color: #e2bb68; }
+#chat-controls .bt-controls [data-bt] { position: relative; }
+#chat-controls .bt-controls [data-bt][aria-expanded="true"] { color: var(--bt-gold, #e2bb68); }
+/* Pastille : masqué chez moi ou rideau baissé. */
+#chat-controls .bt-controls [data-bt].bt-alert::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e2bb68;
+  box-shadow: 0 0 0 1.5px rgba(10, 12, 20, .9);
+}
+
+/* Au-dessus du théâtre ; à part, pour rester visible quand le théâtre est masqué ou troué par une fiche. */
+#bt-panel {
+  position: fixed;
+  z-index: calc(var(--z-index-tooltip, 9999) - 999);
+  display: grid;
+  gap: 3px;
+  width: max-content;
+  min-width: 210px;
+  max-width: 280px;
+  padding: 6px;
+  background: rgba(10, 12, 20, .97);
+  border: 1px solid var(--bt-gold);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .7);
+  color: var(--bt-ink);
+  font: 500 14px/1.2 var(--bt-body);
+}
+#bt-panel.bt-wide { width: 260px; }
+#bt-panel .bt-item {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 32px;
+  height: auto;
+  margin: 0;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--bt-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: none;
+}
+#bt-panel .bt-item > i { width: 16px; margin: 0; text-align: center; font-size: 14px; color: var(--bt-gold); }
+#bt-panel .bt-item > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#bt-panel .bt-item > .bt-tail { color: #8a93ad; font-size: 12px; }
+#bt-panel .bt-item:hover:not(:disabled) { border-color: var(--bt-gold); background: #1c2540; }
+#bt-panel .bt-item.bt-on { background: rgba(163, 38, 58, .4); }
+#bt-panel .bt-item.bt-on > .bt-tail { color: var(--bt-gold); }
+#bt-panel .bt-item[data-danger]:hover:not(:disabled) { border-color: #ff6b70; color: #ff6b70; }
+#bt-panel .bt-item[data-danger]:hover:not(:disabled) > i { color: #ff6b70; }
+#bt-panel .bt-item:disabled { opacity: .4; cursor: default; }
+#bt-panel .bt-head { display: flex; align-items: center; gap: 6px; padding: 0 2px 3px; font: 700 14px var(--bt-display); color: var(--bt-gold); }
+#bt-panel .bt-back {
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--bt-rule);
+  border-radius: 6px;
+  background: var(--bt-navy-2);
+  color: var(--bt-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: none;
+}
+#bt-panel .bt-back:hover { border-color: var(--bt-gold); }
+#bt-panel .bt-back i { margin: 0; font-size: 12px; }
+#bt-panel .bt-search {
+  width: 100%;
+  height: 30px;
+  margin: 0 0 3px;
+  padding: 0 9px;
+  border: 1px solid var(--bt-rule);
+  border-radius: 7px;
+  background: var(--bt-navy);
+  color: var(--bt-ink);
+  font: inherit;
+}
+#bt-panel .bt-search:focus { border-color: var(--bt-gold); outline: none; box-shadow: none; }
+#bt-panel .bt-list { display: grid; gap: 2px; max-height: min(340px, 55vh); overflow-y: auto; scrollbar-width: thin; }
+#bt-panel .bt-actor { padding: 3px 8px 3px 4px; }
+#bt-panel .bt-actor img {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--bt-rule);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 20%;
+  background: var(--bt-navy-2);
+}
+#bt-panel .bt-actor.bt-on img { border-color: var(--bt-gold); }
+#bt-panel .bt-note { margin: 4px 6px; color: #8a93ad; font-size: 12px; font-style: italic; }
