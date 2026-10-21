@@ -13,7 +13,7 @@ body.bcs-on {
   --bcs-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
   --bcs-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
 
-  /* Parchemin (par défaut) : vélin et bordeaux le jour ; la nuit, quasi-noir à sous-ton bleu et or (Nuit profonde) */
+  /* Parchemin (par défaut) : vélin et bordeaux le jour ; la nuit, gris neutres et or (Graphite, comme Character Sheet Meyiv) */
   --bcs-l-bg: #f6f1e6;  --bcs-l-bg2: #f1eadb;  --bcs-l-win: #ebe5d8;  --bcs-l-head: #e3dac6;
   --bcs-l-field: #fffaf0;  --bcs-l-solid: #fff;  --bcs-l-chip: #efe6d4;  --bcs-l-track: #e5dccb;
   --bcs-l-ink: #2a221d;  --bcs-l-soft: #6b5d52;  --bcs-l-rule: #cdbfa6;
@@ -21,12 +21,12 @@ body.bcs-on {
   --bcs-l-gilt: #a8823a;  --bcs-l-red: #c0262d;  --bcs-l-green: #3f7d3a;  --bcs-l-blue: #1f5fd1;  --bcs-l-orange: #d9730d;
   --bcs-l-chat: #f8f4ea;  --bcs-l-shadow: rgba(42, 34, 29, .45);
 
-  --bcs-d-bg: #12151c;  --bcs-d-bg2: #0f1218;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #111622, #06080b 70%);  --bcs-d-head: #030405;
-  --bcs-d-field: #1a1e28;  --bcs-d-solid: #060709;  --bcs-d-chip: #242a36;  --bcs-d-track: #090b0f;
-  --bcs-d-ink: #eaedf4;  --bcs-d-soft: #a4acbe;  --bcs-d-rule: #333b4c;
-  --bcs-d-accent: #e6bf6d;  --bcs-d-accent2: #cfa553;  --bcs-d-btn: #a3263a;  --bcs-d-btn-hover: #bd3047;  --bcs-d-btn-ink: #fff;
-  --bcs-d-gilt: #d9b264;  --bcs-d-red: #ff7070;  --bcs-d-green: #85d6a0;  --bcs-d-blue: #79abff;  --bcs-d-orange: #ffa955;
-  --bcs-d-chat: #14171f;  --bcs-d-shadow: rgba(0, 0, 0, .85);
+  --bcs-d-bg: #1b1b1e;  --bcs-d-bg2: #18181b;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #1d1d20, #121214 70%);  --bcs-d-head: #0d0d0f;
+  --bcs-d-field: #242428;  --bcs-d-solid: #0c0c0e;  --bcs-d-chip: #2c2c31;  --bcs-d-track: #0f0f11;
+  --bcs-d-ink: #f2f2f3;  --bcs-d-text: #dcdce0;  --bcs-d-soft: #a8a8ae;  --bcs-d-rule: #34343a;
+  --bcs-d-accent: #e3bd6b;  --bcs-d-accent2: #cba453;  --bcs-d-btn: #a3263a;  --bcs-d-btn-hover: #bd3047;  --bcs-d-btn-ink: #fff;
+  --bcs-d-gilt: #cfa95e;  --bcs-d-red: #ff7070;  --bcs-d-green: #85d6a0;  --bcs-d-blue: #79abff;  --bcs-d-orange: #ffa955;
+  --bcs-d-chat: #1d1d20;  --bcs-d-shadow: rgba(0, 0, 0, .7);
 }
 /* Ardoise : gris bleuté et bleu, sobre */
 body.bcs-on.bcs-pal-ardoise {
@@ -39,7 +39,7 @@ body.bcs-on.bcs-pal-ardoise {
 
   --bcs-d-bg: #16181d;  --bcs-d-bg2: #121418;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #181b21, #08090b 70%);  --bcs-d-head: #050607;
   --bcs-d-field: #1f232b;  --bcs-d-solid: #08090b;  --bcs-d-chip: #2a2f39;  --bcs-d-track: #0b0c0f;
-  --bcs-d-ink: #e8ebf0;  --bcs-d-soft: #a3abb9;  --bcs-d-rule: #363c48;
+  --bcs-d-ink: #f0f2f5;  --bcs-d-text: #d8dbe1;  --bcs-d-soft: #a6aebb;  --bcs-d-rule: #363c48;
   --bcs-d-accent: #8fb4ff;  --bcs-d-accent2: #6f98ea;  --bcs-d-btn: #3d63a8;  --bcs-d-btn-hover: #4a74bd;  --bcs-d-btn-ink: #fff;
   --bcs-d-gilt: #6fc3bf;  --bcs-d-red: #ff7b72;  --bcs-d-green: #7ee2a0;  --bcs-d-blue: #79a8ff;  --bcs-d-orange: #ffab5e;
   --bcs-d-chat: #1f232b;  --bcs-d-shadow: rgba(0, 0, 0, .6);
@@ -55,7 +55,7 @@ body.bcs-on.bcs-pal-foret {
 
   --bcs-d-bg: #141812;  --bcs-d-bg2: #10130f;  --bcs-d-win: radial-gradient(130% 90% at 50% 0%, #171d15, #070906 70%);  --bcs-d-head: #040503;
   --bcs-d-field: #1d231b;  --bcs-d-solid: #070906;  --bcs-d-chip: #283024;  --bcs-d-track: #0a0c09;
-  --bcs-d-ink: #e8ece1;  --bcs-d-soft: #a8b29c;  --bcs-d-rule: #364032;
+  --bcs-d-ink: #f0f3ea;  --bcs-d-text: #d8ddd0;  --bcs-d-soft: #aab49e;  --bcs-d-rule: #364032;
   --bcs-d-accent: #b5d68f;  --bcs-d-accent2: #98bd72;  --bcs-d-btn: #4f7a3a;  --bcs-d-btn-hover: #5d8b46;  --bcs-d-btn-ink: #fff;
   --bcs-d-gilt: #d4b06a;  --bcs-d-red: #ff7a6b;  --bcs-d-green: #9fdc8a;  --bcs-d-blue: #7fb0e8;  --bcs-d-orange: #f0a250;
   --bcs-d-chat: #1a2018;  --bcs-d-shadow: rgba(0, 0, 0, .65);
@@ -70,6 +70,7 @@ body.bcs-on.bcs-auto .theme-light {
   --bcs-bg: var(--bcs-l-bg);  --bcs-bg2: var(--bcs-l-bg2);  --bcs-win: var(--bcs-l-win);  --bcs-head: var(--bcs-l-head);
   --bcs-field: var(--bcs-l-field);  --bcs-solid: var(--bcs-l-solid);  --bcs-chip: var(--bcs-l-chip);  --bcs-track: var(--bcs-l-track);
   --bcs-ink: var(--bcs-l-ink);  --bcs-soft: var(--bcs-l-soft);  --bcs-rule: var(--bcs-l-rule);
+  --bcs-text: var(--bcs-l-ink);  --bcs-text-hover: var(--bcs-l-ink);
   --bcs-accent: var(--bcs-l-accent);  --bcs-accent2: var(--bcs-l-accent2);
   --bcs-btn: var(--bcs-l-btn);  --bcs-btn-hover: var(--bcs-l-btn-hover);  --bcs-btn-ink: var(--bcs-l-btn-ink);
   --bcs-gilt: var(--bcs-l-gilt);  --bcs-red: var(--bcs-l-red);  --bcs-green: var(--bcs-l-green);  --bcs-blue: var(--bcs-l-blue);  --bcs-orange: var(--bcs-l-orange);
@@ -91,6 +92,7 @@ body.bcs-on.bcs-auto #interface.theme-dark .chat-message {
   --bcs-bg: var(--bcs-d-bg);  --bcs-bg2: var(--bcs-d-bg2);  --bcs-win: var(--bcs-d-win);  --bcs-head: var(--bcs-d-head);
   --bcs-field: var(--bcs-d-field);  --bcs-solid: var(--bcs-d-solid);  --bcs-chip: var(--bcs-d-chip);  --bcs-track: var(--bcs-d-track);
   --bcs-ink: var(--bcs-d-ink);  --bcs-soft: var(--bcs-d-soft);  --bcs-rule: var(--bcs-d-rule);
+  --bcs-text: var(--bcs-d-text);  --bcs-text-hover: #fff;
   --bcs-accent: var(--bcs-d-accent);  --bcs-accent2: var(--bcs-d-accent2);
   --bcs-btn: var(--bcs-d-btn);  --bcs-btn-hover: var(--bcs-d-btn-hover);  --bcs-btn-ink: var(--bcs-d-btn-ink);
   --bcs-gilt: var(--bcs-d-gilt);  --bcs-red: var(--bcs-d-red);  --bcs-green: var(--bcs-d-green);  --bcs-blue: var(--bcs-d-blue);  --bcs-orange: var(--bcs-d-orange);
@@ -296,7 +298,7 @@ body.bcs-on .application.custom-dialog {
     border-radius: 6px 6px 0 0;
     text-shadow: none;
   }
-  & nav.custom-tabs .item:hover { color: var(--bcs-ink); }
+  & nav.custom-tabs .item:hover { color: var(--bcs-text-hover); }
   & nav.custom-tabs .item.active { color: var(--bcs-accent); border-bottom-color: var(--bcs-accent); background: var(--bcs-tab); }
   & .custom-system-component-root.tab { padding-top: 6px; }
 
@@ -337,9 +339,9 @@ body.bcs-on .application.custom-dialog {
     letter-spacing: .08em;
     color: var(--bcs-soft);
   }
-  & tr.custom-system-dynamicRow > td { padding: 4px 6px; border-bottom: 1px solid var(--bcs-row); }
+  & tr.custom-system-dynamicRow > td { padding: 4px 6px; border-bottom: 1px solid var(--bcs-row); color: var(--bcs-text); }
   & tr.custom-system-dynamicRow:nth-child(even) > td { background: var(--bcs-zebra); }
-  & tr.custom-system-dynamicRow:hover > td { background: var(--bcs-hover); }
+  & tr.custom-system-dynamicRow:hover > td { background: var(--bcs-hover); color: var(--bcs-text-hover); }
   & :is(.custom-system-dynamic-table-row-icons, .custom-system-dynamic-table-sort-icon-wrapper) a { color: var(--bcs-soft); }
   & :is(.custom-system-dynamic-table-row-icons, .custom-system-dynamic-table-sort-icon-wrapper) a:hover { color: var(--bcs-accent); }
   & a.custom-system-deleteDynamicLine:hover { color: var(--bcs-red); }
@@ -358,6 +360,33 @@ body.bcs-on .application.custom-dialog {
   & a.content-link { color: var(--bcs-ink); background: var(--bcs-chip); border-color: var(--bcs-rule); }
   & a.content-link:hover { border-color: var(--bcs-accent); }
   & a.content-link i { color: var(--bcs-soft); }
+  /* Objets des listes : plus de pastille encadrée, icône 24 px et nom 14 px ; survol = nom blanc (nuit), icône dorée.
+     CSB borne l'icône à 15 px (@layer system). */
+  & a.content-link:has(> .custom-system-item-container-image) {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    padding: 2px 6px 2px 2px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    font: 600 14px/1.2 var(--bcs-body);
+    color: var(--bcs-text);
+    transition: color .12s, background .12s;
+  }
+  & a.content-link:has(> .custom-system-item-container-image):hover { color: var(--bcs-text-hover); background: var(--bcs-hover); border-color: transparent; }
+  & a.content-link > img.custom-system-item-container-image {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    box-shadow: 0 2px 6px -3px rgba(0, 0, 0, .6);
+    transition: border-color .12s;
+  }
+  & a.content-link:hover > img.custom-system-item-container-image { border-color: var(--bcs-gilt); }
 
   /* Jauges : CSB colore le remplissage lui-même (vert, orange, rouge) */
   & .custom-system-meter {
@@ -432,6 +461,19 @@ body.bcs-on .application.custom-dialog {
 /* =====================================================================
    Chat : tous les messages (texte, jets /r, chuchotements, messages des fiches CSB)
    ===================================================================== */
+/* Nuit : le chat prend les tons de la barre latérale de Foundry (#0b0a13, pointe violette) au lieu de la palette,
+   sans grain (le chat de Foundry est uni). Couleurs opaques : les messages restent lisibles en notification sur la carte. */
+body.bcs-on.bcs-dark .chat-message,
+body.bcs-on.bcs-auto.theme-dark .chat-message,
+body.bcs-on.bcs-auto .theme-dark .chat-message,
+body.bcs-on.bcs-auto #interface.theme-dark .chat-message {
+  --bcs-chat: #18171f;
+  --bcs-bg2: #15141c;
+  --bcs-field: #211f29;
+  --bcs-chip: #2a2833;
+  --bcs-rule: #36343f;
+  --bcs-grain-card: none;
+}
 body.bcs-on .chat-message {
   background: var(--bcs-grain-card), linear-gradient(var(--bcs-chat), var(--bcs-bg2)) !important;
   border: 1px solid var(--bcs-rule) !important;
@@ -456,7 +498,7 @@ body.bcs-on .chat-message {
     text-transform: uppercase;
     letter-spacing: .08em;
   }
-  & .message-content { font: 400 14px/1.45 var(--bcs-body); color: var(--bcs-ink); }
+  & .message-content { font: 400 14px/1.45 var(--bcs-body); color: var(--bcs-text); }
   & .message-content a:not(.inline-roll):not(.content-link) { color: var(--bcs-accent); }
   & .message-content :is(h1, h2, h3, h4) { font-family: var(--bcs-display); color: var(--bcs-accent); border-color: var(--bcs-rule); }
 }

@@ -8,7 +8,7 @@
       "url": "https://github.com/TitiMonky"
     }
   ],
-  "version": "1.4.0",
+  "version": "1.5.0",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -22,5 +22,5 @@
   "socket": true,
   "url": "https://github.com/TitiMonky/titimonky-foundry-modules",
   "manifest": "https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/jukebox-meyiv/module.json",
-  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/jukebox-meyiv-v1.4.0/jukebox-meyiv.zip"
+  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/jukebox-meyiv-v1.5.0/jukebox-meyiv.zip"
 }

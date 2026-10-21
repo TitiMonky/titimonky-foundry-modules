@@ -7,26 +7,26 @@
 
 .jbm-ui,
 .application.jbm-app {
-  --jdr-vellum: #12151c;
-  --jdr-paper-2: #0f1218;
-  --jdr-field: #1a1e28;
-  --jdr-chip: #242a36;
-  --jdr-track: #090b0f;
-  --jdr-ink: #eaedf4;
-  --jdr-ink-soft: #a4acbe;
-  --jdr-rule: #333b4c;
-  --jdr-row-rule: rgba(64, 74, 96, .55);
-  --jdr-bordeaux: #e6bf6d;
+  --jdr-vellum: #1b1b1e;
+  --jdr-paper-2: #18181b;
+  --jdr-field: #242428;
+  --jdr-chip: #2c2c31;
+  --jdr-track: #0f0f11;
+  --jdr-ink: #f2f2f3;
+  --jdr-ink-soft: #a8a8ae;
+  --jdr-rule: #34343a;
+  --jdr-row-rule: rgba(255, 255, 255, .06);
+  --jdr-bordeaux: #e3bd6b;
   --jdr-btn: #a3263a;
   --jdr-btn-hover: #bd3047;
   --jdr-btn-ink: #fff;
-  --jdr-gilt: #d9b264;
+  --jdr-gilt: #cfa95e;
   --jdr-gilt-soft: rgba(226, 187, 104, .22);
   --jdr-hp: #ff7070;
   --jdr-stamina: #ffa955;
   --jdr-ok: #85d6a0;
-  --jdr-shadow: rgba(0, 0, 0, .85);
-  --jbm-window: radial-gradient(130% 90% at 50% 0%, #111622, #06080b 70%);
+  --jdr-shadow: rgba(0, 0, 0, .7);
+  --jbm-window: radial-gradient(130% 90% at 50% 0%, #1d1d20, #121214 70%);
   --jdr-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .16 0 0 0 -.064'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --jdr-grain-card: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .09 0 0 0 -.036'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --jdr-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
