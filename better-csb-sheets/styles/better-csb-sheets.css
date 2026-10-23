@@ -110,6 +110,25 @@ body.bcs-on.bcs-auto #interface.theme-dark .chat-message {
   --bcs-minus-bg: color-mix(in srgb, var(--bcs-red) 20%, var(--bcs-field));
 }
 
+/* ---------------------------------------------------------------- couleur du personnage
+   scripts/main.js pose bcs-tinted et ses propres --bcs-l-* / --bcs-d-* d'accent sur la fenêtre de la fiche.
+   Les variables du mode étant calculées sur body, on refait ici le choix clair / sombre pour l'accent et ses dérivées. */
+body.bcs-on .application.bcs-tinted {
+  --bcs-accent: var(--bcs-l-accent);  --bcs-accent2: var(--bcs-l-accent2);  --bcs-gilt: var(--bcs-l-gilt);
+  --bcs-hover: color-mix(in srgb, var(--bcs-accent) 6%, transparent);
+}
+body.bcs-on.bcs-dark .application.bcs-tinted,
+body.bcs-on.bcs-auto.theme-dark .application.bcs-tinted:not(.theme-light),
+body.bcs-on.bcs-auto .application.bcs-tinted.theme-dark {
+  --bcs-accent: var(--bcs-d-accent);  --bcs-accent2: var(--bcs-d-accent2);  --bcs-gilt: var(--bcs-d-gilt);
+  --bcs-hover: color-mix(in srgb, var(--bcs-accent) 8%, transparent);
+  --bcs-tab: color-mix(in srgb, var(--bcs-accent) 8%, transparent);
+}
+/* Champ « Couleur d'accent » ajouté à la fenêtre « Configurer la fiche » de Foundry */
+body.bcs-on .bcs-accent-group input[type="color"] { flex: 0 0 44px; height: var(--input-height, 32px); padding: 2px; }
+body.bcs-on .bcs-accent-swatch { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 5px; border: 1px solid rgba(0, 0, 0, .35); }
+body.bcs-on .bcs-accent-group [hidden] { display: none; }
+
 /* ---------------------------------------------------------------- fenêtres (fiches et fenêtres de jet)
    Fiches : acteurs et objets en ApplicationV2, sauf les templates (mode construction). */
 body.bcs-on .application.custom-system:is(.actor-v2, .item-v2):not(._template, ._equippableItemTemplate, .subTemplate, .userInputTemplate),

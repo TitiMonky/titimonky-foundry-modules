@@ -1,14 +1,14 @@
 {
   "id": "better-csb-sheets",
   "title": "Better CSB Sheets",
-  "description": "A cleaner look for any Custom System Builder sheet, roll dialog and chat message, without touching your templates: readable fields, tabs, tables and gauges, roll results with dice shown under the total, light and dark modes (neutral graphite night with a fine grain, larger item rows) and a choice of palettes (parchment, slate, forest). Turns itself off when Character Sheet Meyiv is active.",
+  "description": "A cleaner look for any Custom System Builder sheet, roll dialog and chat message, without touching your templates: readable fields, tabs, tables and gauges, roll results with dice shown under the total, light and dark modes (neutral graphite night with a fine grain, larger item rows), a choice of palettes (parchment, slate, forest), and an optional accent colour per character (the player's Foundry colour or one they pick), kept readable in both modes. Turns itself off when Character Sheet Meyiv is active.",
   "authors": [
     {
       "name": "TitiMonky",
       "url": "https://github.com/TitiMonky"
     }
   ],
-  "version": "1.2.1",
+  "version": "1.3.2",
   "compatibility": {
     "minimum": "13",
     "verified": "14"
@@ -29,5 +29,5 @@
   ],
   "url": "https://github.com/TitiMonky/titimonky-foundry-modules",
   "manifest": "https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/better-csb-sheets/module.json",
-  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/better-csb-sheets-v1.2.1/better-csb-sheets.zip"
+  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/better-csb-sheets-v1.3.2/better-csb-sheets.zip"
 }
