@@ -148,7 +148,7 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer {
 #bt-widget {
   left: 232px;
   bottom: 16px;
-  width: 260px;
+  width: 280px;
   background: var(--jdr-grain-card), var(--jdr-vellum);
   border: 1px solid var(--jdr-gilt);
   border-radius: 10px;
@@ -194,6 +194,7 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer {
   gap: 6px;
   padding: 7px 8px 0 10px;
 }
+#bt-widget .bt-row:has([data-bt="add"]) { grid-template-columns: minmax(0, 1fr) auto auto auto auto; }
 #bt-widget .bt-row + .bt-row { border-top: 1px solid var(--jdr-row-rule); }
 #bt-widget .bt-row:last-child { padding-bottom: 7px; }
 #bt-widget .bt-row:has(.bt-bar):last-child { padding-bottom: 0; }
@@ -221,6 +222,41 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer {
 #bt-widget .bt-row button[data-bt="stop"]:hover { background: var(--jdr-hp); border-color: var(--jdr-hp); }
 #bt-widget .bt-row button:disabled { opacity: .35; pointer-events: none; }
 #bt-widget .bt-row .bt-bar { grid-column: 1 / -1; height: 3px; margin: 7px -8px 0 -10px; border-radius: 0; }
+
+/* Menu « Ajouter / retirer du temps » : flotte au-dessus du bouton ± d'une ligne du widget (ajouts, puis retraits) */
+#bt-addmenu {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 4px;
+  padding: 5px;
+  background: var(--jdr-grain-card), var(--jdr-vellum);
+  border: 1px solid var(--jdr-gilt);
+  border-radius: 9px;
+  box-shadow: 0 6px 18px var(--jdr-shadow);
+}
+#bt-addmenu[hidden] { display: none; }
+#bt-addmenu button {
+  height: 26px;
+  min-width: 0;
+  padding: 0 9px;
+  margin: 0;
+  font-family: var(--jdr-body);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--jdr-bordeaux);
+  background: var(--jdr-chip);
+  border: 1px solid var(--jdr-rule);
+  border-radius: 13px;
+  box-shadow: none;
+}
+#bt-addmenu button:hover { color: var(--jdr-btn-ink); background: var(--jdr-btn); border-color: var(--jdr-btn); }
+#bt-addmenu .bt-minus { color: var(--jdr-ink-soft); }
+#bt-addmenu .bt-minus:hover { background: var(--jdr-hp); border-color: var(--jdr-hp); }
+
+/* ------------------------------------------- message du chat (lancement, ± temps) */
+.chat-message .bt-chat { display: flex; align-items: baseline; gap: 7px; }
+.chat-message .bt-chat i { flex: none; opacity: .75; }
 
 /* -------------------------------------------------------- fenêtre de lancement */
 .application.better-timer { font-family: var(--jdr-body); }

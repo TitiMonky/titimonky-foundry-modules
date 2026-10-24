@@ -15,7 +15,8 @@ const PRESETS = [
   { label: "30 min", sec: 1800 },
   { label: "1 h", sec: 3600 }
 ];
-const DEFAULT_FORM = { kind: "down", duration: 300, ticks: "last10", endSound: true, visibility: "public", ignorePause: false };
+const ADD_PRESETS = [1, 2, 5, 10]; // minutes proposées (en + et en −) par le menu « Ajouter / retirer du temps » du widget
+const DEFAULT_FORM ={ kind: "down", duration: 300, ticks: "last10", endSound: true, visibility: "public", ignorePause: false };
 
 /* ------------------------------------------------------------------ état */
 
@@ -50,6 +51,14 @@ function formatTime(sec) {
   const s = sec % 60;
   const pad = n => String(n).padStart(2, "0");
   return h ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+// Durée lisible pour le chat : « 5 min », « 1 h 30 min », « 45 s ».
+function formatSpan(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return [h && `${h} h`, m && `${m} min`, s && `${s} s`].filter(Boolean).join(" ") || "0 s";
 }
 
 const labelOf = t => t.label || (t.kind === "down" ? "Minuteur" : "Chronomètre");
@@ -90,6 +99,20 @@ function mutate(fn) {
   return queue;
 }
 
+/* ------------------------------------------------------------------- chat */
+
+// Annonce courte dans le chat (réglage « Messages dans le chat ») ; en message privé au MJ si les joueurs ne voient pas le minuteur.
+function announce(t, icon, text) {
+  if (!game.settings.get(ID, "chatMessages")) return;
+  ChatMessage.create({
+    speaker: { alias: "Minuteur" },
+    content: `<div class="bt-chat"><i class="fa-solid fa-${icon}"></i><span>${text}</span></div>`,
+    whisper: t.visibility === "public" ? [] : game.users.filter(u => u.isGM).map(u => u.id)
+  });
+}
+
+const quoted = t => t.label ? ` « ${esc(t.label)} »` : "";
+
 /* ------------------------------------------------------------------- API */
 
 async function start({ kind = "down", label = "", duration = 0, ticks = "last10", endSound = true, visibility = "public", ignorePause = false } = {}) {
@@ -117,6 +140,8 @@ async function start({ kind = "down", label = "", duration = 0, ticks = "last10"
   };
   sync(t, at);
   await mutate(timers => { timers[t.id] = t; });
+  if (kind === "down") announce(t, "hourglass-start", `Minuteur${quoted(t)} lancé : <strong>${formatSpan(ms / 1000)}</strong>`);
+  else announce(t, "stopwatch", `Chronomètre${quoted(t)} lancé`);
   return t.id;
 }
 
@@ -134,6 +159,29 @@ const stop = id => mutate(timers => {
   if (!timers[id]) return false;
   delete timers[id];
 });
+
+// Ajoute (secondes > 0) ou retire (secondes < 0) du temps à un compte à rebours. Un minuteur terminé (encore affiché)
+// repart avec le temps ajouté ; retirer plus que le temps restant le termine tout de suite (même en pause).
+async function addTime(id, seconds) {
+  const ms = Math.round(Number(seconds) * 1000);
+  let changed = null;
+  await mutate(timers => {
+    const t = timers[id];
+    if (!t || t.kind !== "down" || !ms || (ms < 0 && t.finishedAt)) return false;
+    const at = now();
+    t.duration = Math.max(1, t.duration + ms);
+    if (t.finishedAt) {
+      t.finishedAt = null;
+      t.pausedByGame = !t.ignorePause && game.paused;
+      sync(t, at);
+    } else if (elapsedOf(t, at) >= t.duration) Object.assign(t, { elapsed: t.duration, startedAt: null, finishedAt: at });
+    changed = { ...t };
+  });
+  if (!changed) return;
+  const span = `${ms > 0 ? "+" : "−"}${formatSpan(Math.round(Math.abs(ms) / 1000))}`;
+  announce(changed, "plus-minus", `<strong>${span}</strong> pour ${changed.label ? quoted(changed).trim() : "le minuteur"}`
+    + (ms < 0 && changed.finishedAt ? " : temps écoulé" : ""));
+}
 
 /* ----------------------------------------------- tâches du MJ actif seul */
 
@@ -234,6 +282,7 @@ function rowHTML(t) {
       <span class="bt-state"></span>
     </div>
     <span class="bt-time"></span>
+    ${t.kind === "down" ? `<button type="button" data-bt="add" data-tooltip="Ajouter / retirer du temps"><i class="fa-solid fa-plus-minus"></i></button>` : ""}
     <button type="button" data-bt="toggle"><i class="fa-solid fa-pause"></i></button>
     <button type="button" data-bt="stop" data-tooltip="Arrêter"><i class="fa-solid fa-stop"></i></button>
     ${t.kind === "down" ? `<div class="bt-bar"><span></span></div>` : ""}
@@ -244,6 +293,7 @@ function rowHTML(t) {
 function render() {
   const timers = sortedTimers();
   for (const id of lastSeen.keys()) if (!timers.some(t => t.id === id)) lastSeen.delete(id);
+  if (!timers.some(t => t.id === document.getElementById("bt-addmenu")?.dataset.timer)) closeAddMenu();
   if (game.user.isGM) {
     const root = ensureRoot("bt-widget");
     root.hidden = !timers.length;
@@ -333,6 +383,29 @@ function makeDraggable(el, key, handleOnly) {
   });
 }
 
+/* ---------------------------------- menu « Ajouter / retirer du temps » (MJ) */
+
+// Petit menu flottant posé au-dessus du bouton (en dessous s'il n'y a pas la place) : une ligne d'ajouts,
+// une ligne de retraits. Hors du widget, qui coupe ce qui dépasse et se reconstruit à chaque changement des minuteurs.
+function openAddMenu(button, id) {
+  const menu = ensureRoot("bt-addmenu");
+  if (!menu.hidden && menu.dataset.timer === id) return closeAddMenu();
+  menu.dataset.timer = id;
+  menu.innerHTML = ADD_PRESETS.map(min => `<button type="button" data-min="${min}">+${min} min</button>`).join("")
+    + ADD_PRESETS.map(min => `<button type="button" data-min="-${min}" class="bt-minus">−${min} min</button>`).join("");
+  menu.hidden = false;
+  const b = button.getBoundingClientRect();
+  const { width, height } = menu.getBoundingClientRect();
+  place(menu, b.right - width, b.top - height - 6 >= 0 ? b.top - height - 6 : b.bottom + 6);
+}
+
+function closeAddMenu() {
+  const menu = document.getElementById("bt-addmenu");
+  if (!menu) return;
+  menu.hidden = true;
+  delete menu.dataset.timer;
+}
+
 /* ---------------------------------------------------- fenêtre de lancement */
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -407,6 +480,11 @@ function openLauncher() {
 
 Hooks.once("init", () => {
   game.settings.register(ID, "timers", { scope: "world", config: false, type: Object, default: {}, onChange: () => render() });
+  game.settings.register(ID, "chatMessages", {
+    name: "Messages dans le chat",
+    hint: "Annonce le lancement d'un minuteur et le temps ajouté ou retiré (en message privé au MJ si les joueurs ne voient pas le minuteur).",
+    scope: "world", config: true, type: Boolean, default: true
+  });
   game.settings.register(ID, "lastForm", { scope: "client", config: false, type: Object, default: {} });
   game.settings.register(ID, "displayPos", { scope: "client", config: false, type: Object, default: {} });
   game.settings.register(ID, "widgetPos", { scope: "client", config: false, type: Object, default: {} });
@@ -429,7 +507,7 @@ Hooks.on("getSceneControlButtons", controls => {
 Hooks.on("pauseGame", paused => syncGamePause(paused));
 
 Hooks.once("ready", () => {
-  game.modules.get(ID).api = { start, pause, resume, stop, open: openLauncher };
+  game.modules.get(ID).api = { start, pause, resume, stop, addTime, open: openLauncher };
   foundry.audio.AudioHelper.preloadSound(`${AUDIO}/end.wav`);
 
   const display = ensureRoot("bt-display");
@@ -441,10 +519,26 @@ Hooks.once("ready", () => {
     if (!button) return;
     const id = button.closest("[data-id]")?.dataset.id;
     if (button.dataset.bt === "new") openLauncher();
+    else if (button.dataset.bt === "add") openAddMenu(button, id);
     else if (button.dataset.bt === "stop") stop(id);
     else if (button.dataset.bt === "toggle") readTimers()[id]?.paused ? resume(id) : pause(id);
   });
+  const addMenu = ensureRoot("bt-addmenu");
+  addMenu.addEventListener("click", event => {
+    const min = Number(event.target.closest("[data-min]")?.dataset.min);
+    if (!min) return;
+    addTime(addMenu.dataset.timer, min * 60);
+    closeAddMenu();
+  });
+  // Un clic ailleurs (y compris pour déplacer le widget) ou Échap ferme le menu.
+  document.addEventListener("pointerdown", event => {
+    if (!addMenu.hidden && !addMenu.contains(event.target) && !event.target.closest('[data-bt="add"]')) closeAddMenu();
+  }, true);
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeAddMenu();
+  });
   window.addEventListener("resize", () => {
+    closeAddMenu();
     restorePosition(display, "displayPos");
     restorePosition(widget, "widgetPos");
   });
