@@ -3,6 +3,8 @@
 // (ajouter leur personnage, émotion, miroir, retirer) et il vérifie qu'ils en ont le droit.
 // La ronde est calculée par chaque client d'après son propre écran : même ordre pour tous, pas les mêmes pixels.
 // Les portraits laissent passer les clics, sauf pour leur propriétaire (et le MJ) qui ouvre ainsi leur menu.
+// Main levée (à la Google Meet) : un joueur demande la parole par Alt+L ou le menu de son portrait ; la file d'attente
+// est dans le même réglage, badge sur le portrait et dans la liste des joueurs, le MJ donne la parole ou baisse.
 
 const ID = "better-theater";
 const SOCKET = `module.${ID}`;
@@ -11,6 +13,7 @@ const GAP = 14;                 // écart minimal entre deux portraits (px)
 const MIN_OPEN = 20;            // demi-ouverture minimale en bas de la ronde (degrés)
 const MAX_OPEN = 80;            // au-delà, on n'ouvre plus : les portraits se rapprochent
 const BUBBLE_MS = 5000;
+const FLOOR_MS = 4000;          // « parle » du portrait à qui le MJ donne la parole
 const FALLBACK_IMG = "icons/svg/mystery-man.svg";
 
 /* ----------------------------------------------------------------- outils */
@@ -32,7 +35,8 @@ function readStage() {
   return {
     entries: Array.isArray(s.entries) ? s.entries : [],
     focus: s.focus ?? null,
-    curtain: !!s.curtain
+    curtain: !!s.curtain,
+    hands: Array.isArray(s.hands) ? s.hands : []
   };
 }
 
@@ -66,6 +70,99 @@ function describe(entry) {
     pc: !!actor?.hasPlayerOwner,
     color: player ? String(player.color?.css ?? player.color) : null
   };
+}
+
+/* ------------------------------------------------------------ mains levées */
+
+// La main appartient au joueur, pas au personnage : elle se lève même sans portrait sur scène (Alt+L ou
+// le menu du portrait, volontairement pas de bouton près du chat). On retient le portrait d'où elle a été levée.
+const handOf = (userId, stage = readStage()) => stage.hands.find(h => h.userId === userId) ?? null;
+
+// Portrait qui porte le badge : celui d'où la main a été levée, sinon le personnage attitré du joueur, sinon le
+// premier de ses personnages sur scène.
+function handEntry(hand, entries) {
+  const user = game.users.get(hand.userId);
+  if (!user) return null;
+  const owned = e => !!actorOf(e)?.testUserPermission(user, "OWNER");
+  return entries.find(e => e.id === hand.entryId && owned(e))
+    ?? entries.find(e => e.actorId && e.actorId === user.character?.id)
+    ?? entries.find(owned)
+    ?? null;
+}
+
+const ordinal = n => `${n}${n === 1 ? "ʳᵉ" : "ᵉ"}`;
+
+function handKey() {
+  const binding = game.keybindings.get(ID, "hand")?.[0];
+  return binding ? foundry.applications.sidebar.apps.ControlsConfig.humanizeBinding(binding) : "";
+}
+
+// Lève ou baisse ma main (raccourci, menu du portrait).
+function toggleHand(entryId = null) {
+  if (game.user.isGM) return;
+  if (handOf(game.user.id)) request("lowerHand", { userId: game.user.id });
+  else request("raiseHand", { entryId });
+}
+
+// Le MJ donne la parole : la main se baisse, le portrait « parle » chez tout le monde et le joueur est prévenu.
+function giveFloor(userId) {
+  const stage = readStage();
+  const hand = handOf(userId, stage);
+  if (!game.user.isGM || !hand) return;
+  const msg = { type: "floor", userId, entryId: handEntry(hand, stage.entries)?.id ?? null };
+  request("lowerHand", { userId });
+  onFloor(msg);
+  game.socket.emit(SOCKET, msg);
+}
+
+function onFloor({ userId, entryId }) {
+  if (entryId) Stage.speak(entryId, FLOOR_MS);
+  if (userId === game.user.id) ui.notifications.info("Better Theater : le MJ vous donne la parole.");
+}
+
+// Son chez le MJ quand une main se lève (pas au chargement : on part des mains déjà levées).
+let knownHands = new Set();
+function onHandsChanged() {
+  const now = new Set(readStage().hands.map(h => h.userId));
+  const raised = [...now].some(id => !knownHands.has(id));
+  knownHands = now;
+  if (raised && game.user.isGM && setting("handSound")) {
+    foundry.audio.AudioHelper.play({ src: CONFIG.sounds.notification, volume: 0.6 }, false);
+  }
+  decoratePlayers();
+}
+
+// Liste des joueurs (en bas à gauche) : la main s'y voit toujours, même sans portrait, théâtre masqué ou rideau
+// baissé. Clic : le joueur baisse sa main, le MJ choisit entre donner la parole et baisser.
+function decoratePlayers() {
+  const root = document.getElementById("players");
+  if (!root) return;
+  const hands = readStage().hands;
+  for (const li of root.querySelectorAll("li.player[data-user-id]")) {
+    const userId = li.dataset.userId;
+    const rank = hands.findIndex(h => h.userId === userId) + 1;
+    let tag = li.querySelector(".bt-hand-tag");
+    if (!rank) {
+      tag?.remove();
+      continue;
+    }
+    if (!tag) {
+      tag = document.createElement("span");
+      tag.className = "bt-hand-tag";
+      tag.innerHTML = `<i class="fa-solid fa-hand"></i><b></b>`;
+      tag.addEventListener("click", event => {
+        event.stopPropagation();
+        if (userId === game.user.id) request("lowerHand", { userId });
+        else if (game.user.isGM) Panel.toggle(tag, "hand", userId);
+      });
+      li.append(tag);
+    }
+    const mine = userId === game.user.id, can = mine || game.user.isGM;
+    tag.querySelector("b").textContent = rank;
+    tag.classList.toggle("bt-can", can);
+    tag.dataset.tooltip = `Main levée (${ordinal(rank)})`
+      + (mine ? " : cliquer pour la baisser" : can ? " : donner la parole ou baisser" : "");
+  }
 }
 
 /* ------------------------------------------------- demandes et écritures */
@@ -129,13 +226,32 @@ const ACTIONS = {
     s.focus = null;
     return true;
   },
-  // Ménage du MJ : entrées dont le personnage a été supprimé.
+  // Mains levées : chacun lève la sienne (pas le MJ) ; le joueur baisse la sienne, le MJ n'importe laquelle.
+  raiseHand(s, { entryId }, user) {
+    if (user.isGM || s.hands.some(h => h.userId === user.id)) return false;
+    const entry = s.entries.find(e => e.id === entryId);
+    s.hands.push({ userId: user.id, entryId: entry && canEdit(user, entry) ? entry.id : null });
+    return true;
+  },
+  lowerHand(s, { userId }, user) {
+    if (!user.isGM && userId !== user.id) return false;
+    const before = s.hands.length;
+    s.hands = s.hands.filter(h => h.userId !== userId);
+    return s.hands.length !== before;
+  },
+  lowerAll(s, _data, user) {
+    if (!user.isGM || !s.hands.length) return false;
+    s.hands = [];
+    return true;
+  },
+  // Ménage du MJ : entrées dont le personnage a été supprimé, mains des joueurs partis.
   prune(s, _data, user) {
     if (!user.isGM) return false;
-    const before = s.entries.length;
+    const before = s.entries.length + s.hands.length;
     s.entries = s.entries.filter(e => !e.actorId || game.actors.has(e.actorId));
     if (s.focus && !s.entries.some(e => e.id === s.focus)) s.focus = null;
-    return s.entries.length !== before;
+    s.hands = s.hands.filter(h => game.users.get(h.userId)?.active);
+    return s.entries.length + s.hands.length !== before;
   }
 };
 
@@ -160,6 +276,7 @@ function request(action, data = {}) {
 function onSocket(msg) {
   if (msg?.type === "request" && isLeadGM()) run(msg.action, msg.data, game.users.get(msg.userId));
   else if (msg?.type === "speak") Stage.speak(msg.id, msg.ms);
+  else if (msg?.type === "floor") onFloor(msg);
 }
 
 const isStaged = actor => !!actor && readStage().entries.some(e => e.actorId === actor.id);
@@ -359,6 +476,13 @@ const Stage = {
     const step = Math.min(path.L / Math.max(n, 1), Math.max(s + GAP, path.L / (n + 2.5)));
     const mid = path.L / 2;
 
+    // Badge de main levée : un par portrait, numéro = place dans la file.
+    const hands = new Map();
+    stage.hands.forEach((hand, i) => {
+      const entry = handEntry(hand, list);
+      if (entry && !hands.has(entry.id)) hands.set(entry.id, { userId: hand.userId, rank: i + 1 });
+    });
+
     const seen = new Set();
     this.layout = new Map();
     list.forEach((entry, i) => {
@@ -375,7 +499,7 @@ const Stage = {
         void el.offsetWidth;
         el.classList.remove("bt-enter");
       }
-      this.updateNode(el, entry, stage);
+      this.updateNode(el, entry, stage, hands.get(entry.id));
       this.place(el, box);
     });
 
@@ -423,7 +547,7 @@ const Stage = {
     return el;
   },
 
-  updateNode(el, entry, stage) {
+  updateNode(el, entry, stage, hand) {
     const img = el.querySelector("img");
     if (el.dataset.src !== entry.img) {
       el.dataset.src = entry.img;
@@ -446,6 +570,24 @@ const Stage = {
         el.querySelector(".bt-float").append(badge);
       }
     } else badge?.remove();
+    let raised = el.querySelector(".bt-hand");
+    if (hand) {
+      if (!raised) {
+        raised = document.createElement("div");
+        raised.className = "bt-hand";
+        raised.innerHTML = `<i class="fa-solid fa-hand"></i><b></b>`;
+        // Ma propre main : un clic la baisse sans ouvrir le menu. Sinon (MJ), le clic ouvre le menu du portrait.
+        raised.addEventListener("click", event => {
+          if (raised.dataset.user !== game.user.id) return;
+          event.stopPropagation();
+          request("lowerHand", { userId: game.user.id });
+        });
+        el.querySelector(".bt-float").append(raised);
+      }
+      raised.dataset.user = hand.userId;
+      raised.querySelector("b").textContent = hand.rank;
+      raised.dataset.tooltip = hand.userId === game.user.id ? "Baisser la main" : `Main levée (${ordinal(hand.rank)})`;
+    } else raised?.remove();
   },
 
   place(el, box) {
@@ -468,9 +610,18 @@ const Stage = {
       `<button type="button" data-act="${act}" ${extra} class="${on ? "bt-on" : ""}" data-tooltip="${tip}" aria-label="${tip}">${icon}</button>`;
     const emotes = EMOTES.map(e => btn("emote", e, "Émotion", entry.emote === e, `data-emote="${e}"`)).join("");
     const stage = readStage();
+    // Main : le joueur lève / baisse la sienne ; le MJ, si une main est levée sur ce portrait, donne la parole ou baisse.
+    const key = handKey();
+    const mine = handOf(game.user.id, stage);
+    const here = stage.hands.find(h => handEntry(h, stage.entries)?.id === id);
+    const hand = gm
+      ? (here ? btn("floor", `<i class="fa-solid fa-microphone"></i>`, `Donner la parole à ${esc(game.users.get(here.userId)?.name)}`)
+        + btn("lower", `<i class="fa-solid fa-hand-back-fist"></i>`, "Baisser la main") : "")
+      : btn("hand", `<i class="fa-solid fa-hand"></i>`, `${mine ? "Baisser" : "Lever"} la main${key ? ` (${key})` : ""}`, !!mine);
     this.menu = document.createElement("div");
     this.menu.className = "bt-menu";
     this.menu.innerHTML = `<div class="bt-row">${emotes}</div><div class="bt-row">`
+      + hand
       + btn("mirror", `<i class="fa-solid fa-arrows-left-right"></i>`, "Miroir", entry.mirror)
       + (gm ? btn("focus", `<i class="fa-solid fa-star"></i>`, "Mettre en avant", stage.focus === id) : "")
       + (gm ? btn("rename", `<i class="fa-solid fa-signature"></i>`, "Renommer") : "")
@@ -488,6 +639,9 @@ const Stage = {
       else if (act === "rename") { this.closeMenu(); promptRename(entry); return; }
       else if (act === "sheet") { this.closeMenu(); actorOf(entry)?.sheet?.render(true); return; }
       else if (act === "remove") { this.closeMenu(); request("remove", { id }); return; }
+      else if (act === "hand") { this.closeMenu(); toggleHand(id); return; }
+      else if (act === "floor") { this.closeMenu(); giveFloor(here.userId); return; }
+      else if (act === "lower") { this.closeMenu(); request("lowerHand", { userId: here.userId }); return; }
       if (act === "emote" || act === "mirror" || act === "focus") b.classList.toggle("bt-on");
       if (act === "emote") this.menu.querySelectorAll('[data-act="emote"]').forEach(x => x !== b && x.classList.remove("bt-on"));
     });
@@ -650,8 +804,17 @@ function injectControls() {
     else controls.append(group);
   }
   const button = group.querySelector('[data-bt="menu"]');
-  const hidden = !!setting("hidden"), curtain = readStage().curtain;
-  const state = [hidden && "masqué chez moi", curtain && "rideau baissé"].filter(Boolean).join(", ");
+  const { curtain, hands } = readStage();
+  const hidden = !!setting("hidden");
+  // Chez le MJ : nombre de mains levées sur le bouton.
+  const count = game.user.isGM ? hands.length : 0;
+  let badge = button.querySelector(".bt-count");
+  if (count) {
+    badge ??= button.appendChild(Object.assign(document.createElement("span"), { className: "bt-count" }));
+    badge.textContent = count;
+  } else badge?.remove();
+  const state = [count && `${count} main${count > 1 ? "s levées" : " levée"}`,
+    hidden && "masqué chez moi", curtain && "rideau baissé"].filter(Boolean).join(", ");
   const tip = `Better Theater${state ? ` (${state})` : ""}`;
   button.classList.toggle("bt-alert", hidden || curtain);
   button.dataset.tooltip = tip;
@@ -674,14 +837,16 @@ const LIST_MAX = 50;
 const Panel = {
   el: null,
   button: null,
-  view: "main",   // « main » ou « actors »
+  view: "main",   // « main », « actors » ou « hand » (main levée d'un joueur, depuis la liste des joueurs)
+  userId: null,
   query: "",
   lazy: null,
 
-  toggle(button) {
+  toggle(button, view = "main", userId = null) {
     if (this.el) return this.close();
     this.button = button;
-    this.view = "main";
+    this.view = view;
+    this.userId = userId;
     this.query = "";
     this.el = document.createElement("div");
     this.el.id = "bt-panel";
@@ -707,15 +872,33 @@ const Panel = {
   refresh() {
     if (!this.el) return;
     if (!this.button?.isConnected) return this.close();
+    if (this.view === "hand" && !handOf(this.userId)) return this.close();
     if (this.view === "actors") this.drawList();
     else this.draw();
   },
 
-  item(act, icon, label, { on = false, danger = false, more = false, disabled = false } = {}) {
-    return `<button type="button" class="bt-item${on ? " bt-on" : ""}" data-act="${act}"${danger ? " data-danger" : ""}${disabled ? " disabled" : ""}>`
+  item(act, icon, label, { on = false, danger = false, more = false, disabled = false, tail = null, user = null } = {}) {
+    return `<button type="button" class="bt-item${on ? " bt-on" : ""}" data-act="${act}"${user ? ` data-user="${user}"` : ""}`
+      + `${danger ? " data-danger" : ""}${disabled ? " disabled" : ""}>`
       + `<i class="fa-solid ${icon}"></i><span>${label}</span>`
-      + (on ? `<i class="fa-solid fa-check bt-tail"></i>` : more ? `<i class="fa-solid fa-chevron-right bt-tail"></i>` : "")
+      + (on ? `<i class="fa-solid fa-check bt-tail"></i>` : more ? `<i class="fa-solid fa-chevron-right bt-tail"></i>`
+        : tail ? `<i class="fa-solid ${tail} bt-tail"></i>` : "")
       + `</button>`;
+  },
+
+  // MJ : mains levées dans l'ordre de la file ; un clic donne la parole.
+  handItems(stage) {
+    if (!stage.hands.length) return "";
+    return `<div class="bt-label">Mains levées</div>`
+      + stage.hands.map((h, i) => {
+        const user = game.users.get(h.userId);
+        const entry = handEntry(h, stage.entries);
+        const name = entry ? describe(entry)?.name : user?.character?.name;
+        const label = `${i + 1}. ${esc(user?.name ?? "?")}${name ? ` <small>${esc(name)}</small>` : ""}`;
+        return this.item("floor", "fa-hand", label, { tail: "fa-microphone", user: h.userId });
+      }).join("")
+      + this.item("lower-all", "fa-hand-back-fist", stage.hands.length > 1 ? "Baisser toutes les mains" : "Baisser la main")
+      + `<div class="bt-sep"></div>`;
   },
 
   draw() {
@@ -723,14 +906,20 @@ const Panel = {
     const stage = readStage();
     const hidden = !!setting("hidden");
     let html;
-    if (this.view === "actors") {
+    if (this.view === "hand") {
+      const user = game.users.get(this.userId);
+      html = `<div class="bt-head"><i class="fa-solid fa-hand"></i><span>${esc(user?.name ?? "?")}</span></div>`
+        + this.item("floor", "fa-microphone", "Donner la parole", { user: this.userId })
+        + this.item("lower", "fa-hand-back-fist", "Baisser la main", { user: this.userId });
+    } else if (this.view === "actors") {
       const search = game.user.isGM || stageableActors().length > 8;
       html = `<div class="bt-head"><button type="button" class="bt-back" data-act="back" aria-label="Retour"><i class="fa-solid fa-chevron-left"></i></button>`
         + `<span>${game.user.isGM ? "Ajouter un personnage" : "Mes personnages"}</span></div>`
         + (search ? `<input type="search" class="bt-search" placeholder="Rechercher…" value="${esc(this.query)}">` : "")
         + `<div class="bt-list"></div>`;
     } else if (game.user.isGM) {
-      html = this.item("image", "fa-image", "Ajouter une image")
+      html = this.handItems(stage)
+        + this.item("image", "fa-image", "Ajouter une image")
         + this.item("actors", "fa-user-plus", "Ajouter un personnage", { more: true })
         + this.item("curtain", "fa-person-booth", "Masquer chez tout le monde", { on: stage.curtain })
         + this.item("hide", "fa-eye-slash", "Masquer chez moi", { on: hidden })
@@ -787,9 +976,11 @@ const Panel = {
     if (!this.el || !this.button) return;
     const r = this.button.getBoundingClientRect();
     const w = this.el.offsetWidth, h = this.el.offsetHeight;
+    // Liste des joueurs (en bas à gauche) : à droite de la ligne. Chat flottant : à gauche du bouton. Sinon au-dessus.
+    const players = !!this.button.closest("#players");
     const side = !!this.button.closest("#chat-notifications");
-    const x = side ? r.left - w - 6 : r.right - w;
-    const y = side ? r.bottom - h : r.top - h - 6;
+    const x = players ? r.right + 6 : side ? r.left - w - 6 : r.right - w;
+    const y = players || side ? r.bottom - h : r.top - h - 6;
     this.el.style.left = `${clamp(x, 8, window.innerWidth - w - 8)}px`;
     this.el.style.top = `${clamp(y, 8, window.innerHeight - h - 8)}px`;
   },
@@ -808,6 +999,9 @@ const Panel = {
     if (act === "curtain") return request("curtain");
     const mine = stageableActors();
     this.close();
+    if (act === "floor") return giveFloor(b.dataset.user);
+    if (act === "lower") return request("lowerHand", { userId: b.dataset.user });
+    if (act === "lower-all") return request("lowerAll");
     if (act === "image") pickImage();
     else if (act === "add") request("addActor", { actorId: mine[0]?.id });
     else if (act === "remove-mine") mine.filter(isStaged).forEach(a => request("removeActor", { actorId: a.id }));
@@ -847,8 +1041,8 @@ function onChatMessage(message) {
 Hooks.once("init", () => {
   const reg = (key, data) => game.settings.register(ID, key, { config: false, ...data });
   reg("stage", {
-    scope: "world", type: Object, default: { entries: [], focus: null, curtain: false },
-    onChange: () => { Stage.render(); injectControls(); }
+    scope: "world", type: Object, default: { entries: [], focus: null, curtain: false, hands: [] },
+    onChange: () => { Stage.render(); injectControls(); onHandsChanged(); }
   });
   reg("max", {
     scope: "world", config: true, type: Number, default: 12,
@@ -869,6 +1063,11 @@ Hooks.once("init", () => {
     hint: "Sur cet ordinateur seulement.",
     onChange: () => Stage.render()
   });
+  reg("handSound", {
+    scope: "client", config: true, type: Boolean, default: true,
+    name: "Son des mains levées",
+    hint: "Pour le MJ : un petit son quand un joueur lève la main (Alt+L ou menu de son portrait)."
+  });
   reg("hidden", {
     scope: "client", type: Boolean, default: false,
     onChange: () => { Stage.render(); injectControls(); }
@@ -880,12 +1079,26 @@ Hooks.once("init", () => {
     editable: [{ key: "KeyH", modifiers: ["Alt"] }],
     onDown: () => { game.settings.set(ID, "hidden", !setting("hidden")); return true; }
   });
+  game.keybindings.register(ID, "hand", {
+    name: "Lever / baisser la main",
+    hint: "Joueurs : demander la parole au MJ. La main s'affiche sur le portrait et dans la liste des joueurs.",
+    // Touche à la même place en AZERTY et QWERTY : Foundry lit la position physique (event.code), Alt+M
+    // tombait sur la virgule des claviers français.
+    editable: [{ key: "KeyL", modifiers: ["Alt"] }],
+    onDown: () => {
+      if (game.user.isGM) return false;
+      toggleHand();
+      return true;
+    }
+  });
 });
 
 Hooks.once("ready", () => {
   Stage.build();
   Holes.start();
   injectControls();
+  knownHands = new Set(readStage().hands.map(h => h.userId));
+  decoratePlayers();
   game.socket.on(SOCKET, onSocket);
 
   window.addEventListener("resize", () => {
@@ -912,6 +1125,7 @@ Hooks.once("ready", () => {
     remove: actor => request("removeActor", { actorId: actor?.id ?? actor }),
     addImage: (img, name) => request("addImage", { img, name }),
     clear: () => request("clear"),
+    lowerHands: () => request("lowerAll"),
     // Fait « parler » un portrait chez tout le monde (entrée du théâtre ou id de personnage).
     speak: (idOrActor, ms = 1500) => {
       const key = idOrActor?.id ?? idOrActor;
@@ -931,6 +1145,11 @@ Hooks.on("collapseSidebar", () => {
 Hooks.on("canvasReady", () => Stage.render());
 Hooks.on("clientSettingChanged", key => { if (key === "core.performanceMode") Stage.render(); });
 Hooks.on("createChatMessage", onChatMessage);
+Hooks.on("renderPlayers", () => decoratePlayers());
+// Un joueur qui part baisse sa main.
+Hooks.on("userConnected", (user, active) => {
+  if (!active && isLeadGM() && handOf(user.id)) run("lowerHand", { userId: user.id }, game.user);
+});
 
 const watched = actor => readStage().entries.some(e => e.actorId === actor?.id);
 Hooks.on("updateActor", actor => { if (watched(actor)) Stage.render(); });

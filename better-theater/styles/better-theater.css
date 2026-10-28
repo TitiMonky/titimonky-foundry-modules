@@ -127,6 +127,50 @@
 }
 @keyframes bt-pop { from { transform: scale(0); } }
 
+/* Main levée : en haut à gauche (l'émotion est à droite), main dorée qui salue et numéro dans la file. */
+#bt-stage .bt-hand {
+  position: absolute;
+  left: -4%;
+  top: 2%;
+  width: 38%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: rgba(12, 18, 34, .9);
+  border: 2px solid var(--bt-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(226, 187, 104, .55), 0 2px 8px rgba(0, 0, 0, .6);
+  animation: bt-pop .35s cubic-bezier(.3, 1.6, .5, 1);
+}
+#bt-stage .bt-hand i {
+  margin: 0;
+  font-size: clamp(14px, 2.2vh, 26px);
+  color: var(--bt-gold);
+  transform-origin: 50% 90%;
+  animation: bt-wave 2.4s ease-in-out infinite;
+}
+#bt-stage .bt-hand b {
+  position: absolute;
+  right: -6%;
+  bottom: -6%;
+  min-width: 42%;
+  padding: 0 3px;
+  border-radius: 99px;
+  background: #a3263a;
+  border: 1.5px solid var(--bt-gold);
+  font: 800 clamp(10px, 1.4vh, 14px)/1.35 var(--bt-body);
+  color: #fff;
+  text-align: center;
+}
+@keyframes bt-wave {
+  0%, 60%, 100% { rotate: 0deg; }
+  10%, 30% { rotate: -16deg; }
+  20%, 40% { rotate: 12deg; }
+}
+#bt-stage.bt-hidden .bt-hand i,
+#bt-stage.bt-curtain:not(.bt-gm) .bt-hand i,
+#bt-stage.bt-calm .bt-hand i { animation: none; }
+
 #bt-stage .bt-overflow {
   position: absolute;
   width: 52px;
@@ -224,6 +268,40 @@
   background: #e2bb68;
   box-shadow: 0 0 0 1.5px rgba(10, 12, 20, .9);
 }
+/* Chez le MJ : nombre de mains levées. */
+#chat-controls .bt-controls [data-bt] .bt-count {
+  position: absolute;
+  top: -4px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 99px;
+  background: #a3263a;
+  border: 1.5px solid #e2bb68;
+  font: 800 10px/13px "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ----- main levée dans la liste des joueurs ----- */
+#players li.player .bt-hand-tag {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border: 1px solid #e2bb68;
+  border-radius: 99px;
+  background: rgba(12, 18, 34, .9);
+  color: #e2bb68;
+  font: 800 11px/17px "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+}
+#players li.player .bt-hand-tag i { margin: 0; font-size: 10px; }
+#players li.player .bt-hand-tag.bt-can { cursor: pointer; }
+#players li.player .bt-hand-tag.bt-can:hover { background: #1c2540; color: #fff; }
 
 /* Au-dessus du théâtre ; à part, pour rester visible quand le théâtre est masqué ou troué par une fiche. */
 #bt-panel {
@@ -316,3 +394,7 @@
 }
 #bt-panel .bt-actor.bt-on img { border-color: var(--bt-gold); }
 #bt-panel .bt-note { margin: 4px 6px; color: #8a93ad; font-size: 12px; font-style: italic; }
+#bt-panel .bt-head > .fa-hand { margin: 0 2px 0 4px; font-size: 13px; }
+#bt-panel .bt-label { padding: 2px 6px 1px; font: 700 12px var(--bt-display); letter-spacing: .04em; color: var(--bt-gold); }
+#bt-panel .bt-item small { margin-left: 4px; color: #8a93ad; font-size: 12px; }
+#bt-panel .bt-sep { height: 1px; margin: 3px 4px; background: var(--bt-rule); }
