@@ -23,6 +23,15 @@ const isLeadGM = () => !!game.users.activeGM?.isSelf;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+// Textes affichés : lang/fr.json et lang/en.json (anglais pour les autres langues de Foundry).
+const t = (key, data) => (data ? game.i18n.format(`BTHEATER.${key}`, data) : game.i18n.localize(`BTHEATER.${key}`));
+
+// Pluriels et rangs (« 1ʳᵉ », « 2nd ») : règles de la langue des textes affichés, pas forcément celle de Foundry.
+function plural(key, n, data = {}, type = "cardinal") {
+  const lang = game.i18n.has("BTHEATER.Theater", false) ? game.i18n.lang : "en";
+  return t(`${key}.${new Intl.PluralRules(lang, { type }).select(n)}`, { ...data, n, count: n });
+}
+
 // Écritures à la file, pour que deux demandes rapprochées ne s'écrasent pas.
 function queue() {
   let chain = Promise.resolve();
@@ -90,7 +99,7 @@ function handEntry(hand, entries) {
     ?? null;
 }
 
-const ordinal = n => `${n}${n === 1 ? "ʳᵉ" : "ᵉ"}`;
+const ordinal = n => plural("Ordinal", n, {}, "ordinal");
 
 function handKey() {
   const binding = game.keybindings.get(ID, "hand")?.[0];
@@ -117,7 +126,7 @@ function giveFloor(userId) {
 
 function onFloor({ userId, entryId }) {
   if (entryId) Stage.speak(entryId, FLOOR_MS);
-  if (userId === game.user.id) ui.notifications.info("Better Theater : le MJ vous donne la parole.");
+  if (userId === game.user.id) ui.notifications.info(t("Notify.Floor"));
 }
 
 // Son chez le MJ quand une main se lève (pas au chargement : on part des mains déjà levées).
@@ -160,8 +169,7 @@ function decoratePlayers() {
     const mine = userId === game.user.id, can = mine || game.user.isGM;
     tag.querySelector("b").textContent = rank;
     tag.classList.toggle("bt-can", can);
-    tag.dataset.tooltip = `Main levée (${ordinal(rank)})`
-      + (mine ? " : cliquer pour la baisser" : can ? " : donner la parole ou baisser" : "");
+    tag.dataset.tooltip = t(mine ? "Hand.ClickLower" : can ? "Hand.ClickChoose" : "Hand.Raised", { rank: ordinal(rank) });
   }
 }
 
@@ -267,7 +275,7 @@ function run(action, data, user) {
 function request(action, data = {}) {
   if (isLeadGM()) return run(action, data, game.user);
   if (!game.users.activeGM) {
-    ui.notifications.warn("Better Theater : le MJ doit être connecté pour modifier le théâtre.");
+    ui.notifications.warn(t("Notify.NeedGM"));
     return;
   }
   game.socket.emit(SOCKET, { type: "request", action, data, userId: game.user.id });
@@ -296,9 +304,9 @@ function pickImage() {
 
 async function promptRename(entry) {
   const value = await foundry.applications.api.DialogV2.prompt({
-    window: { title: "Nom affiché dans le théâtre" },
-    content: `<input type="text" name="name" value="${esc(entry.name)}" placeholder="Vide = nom de la fiche" autofocus>`,
-    ok: { label: "Renommer", callback: (_event, button) => button.form.elements.name.value },
+    window: { title: t("Rename.Title") },
+    content: `<input type="text" name="name" value="${esc(entry.name)}" placeholder="${esc(t("Rename.Placeholder"))}" autofocus>`,
+    ok: { label: t("Rename.Button"), callback: (_event, button) => button.form.elements.name.value },
     rejectClose: false
   });
   if (value !== null && value !== undefined) request("rename", { id: entry.id, name: value });
@@ -521,7 +529,7 @@ const Stage = {
       this.overflow.style.left = `${pos.x}px`;
       this.overflow.style.top = `${pos.y}px`;
       this.overflow.textContent = `+${hidden.length}`;
-      this.overflow.dataset.tooltip = `Rangé${hidden.length > 1 ? "s" : ""} : ${hidden.map(e => esc(e.name)).join(", ")}`;
+      this.overflow.dataset.tooltip = plural("Overflow", hidden.length, { names: hidden.map(e => esc(e.name)).join(", ") });
     } else {
       this.overflow?.remove();
       this.overflow = null;
@@ -586,7 +594,7 @@ const Stage = {
       }
       raised.dataset.user = hand.userId;
       raised.querySelector("b").textContent = hand.rank;
-      raised.dataset.tooltip = hand.userId === game.user.id ? "Baisser la main" : `Main levée (${ordinal(hand.rank)})`;
+      raised.dataset.tooltip = hand.userId === game.user.id ? t("Hand.Lower") : t("Hand.Raised", { rank: ordinal(hand.rank) });
     } else raised?.remove();
   },
 
@@ -608,25 +616,25 @@ const Stage = {
     const gm = game.user.isGM;
     const btn = (act, icon, tip, on = false, extra = "") =>
       `<button type="button" data-act="${act}" ${extra} class="${on ? "bt-on" : ""}" data-tooltip="${tip}" aria-label="${tip}">${icon}</button>`;
-    const emotes = EMOTES.map(e => btn("emote", e, "Émotion", entry.emote === e, `data-emote="${e}"`)).join("");
+    const emotes = EMOTES.map(e => btn("emote", e, t("Menu.Emote"), entry.emote === e, `data-emote="${e}"`)).join("");
     const stage = readStage();
     // Main : le joueur lève / baisse la sienne ; le MJ, si une main est levée sur ce portrait, donne la parole ou baisse.
     const key = handKey();
     const mine = handOf(game.user.id, stage);
     const here = stage.hands.find(h => handEntry(h, stage.entries)?.id === id);
     const hand = gm
-      ? (here ? btn("floor", `<i class="fa-solid fa-microphone"></i>`, `Donner la parole à ${esc(game.users.get(here.userId)?.name)}`)
-        + btn("lower", `<i class="fa-solid fa-hand-back-fist"></i>`, "Baisser la main") : "")
-      : btn("hand", `<i class="fa-solid fa-hand"></i>`, `${mine ? "Baisser" : "Lever"} la main${key ? ` (${key})` : ""}`, !!mine);
+      ? (here ? btn("floor", `<i class="fa-solid fa-microphone"></i>`, t("Hand.GiveFloorTo", { name: esc(game.users.get(here.userId)?.name) }))
+        + btn("lower", `<i class="fa-solid fa-hand-back-fist"></i>`, t("Hand.Lower")) : "")
+      : btn("hand", `<i class="fa-solid fa-hand"></i>`, `${t(mine ? "Hand.Lower" : "Hand.Raise")}${key ? ` (${key})` : ""}`, !!mine);
     this.menu = document.createElement("div");
     this.menu.className = "bt-menu";
     this.menu.innerHTML = `<div class="bt-row">${emotes}</div><div class="bt-row">`
       + hand
-      + btn("mirror", `<i class="fa-solid fa-arrows-left-right"></i>`, "Miroir", entry.mirror)
-      + (gm ? btn("focus", `<i class="fa-solid fa-star"></i>`, "Mettre en avant", stage.focus === id) : "")
-      + (gm ? btn("rename", `<i class="fa-solid fa-signature"></i>`, "Renommer") : "")
-      + (entry.actorId ? btn("sheet", `<i class="fa-solid fa-id-card"></i>`, "Ouvrir la fiche") : "")
-      + btn("remove", `<i class="fa-solid fa-xmark"></i>`, "Retirer du théâtre", false, `data-danger`)
+      + btn("mirror", `<i class="fa-solid fa-arrows-left-right"></i>`, t("Menu.Mirror"), entry.mirror)
+      + (gm ? btn("focus", `<i class="fa-solid fa-star"></i>`, t("Menu.Focus"), stage.focus === id) : "")
+      + (gm ? btn("rename", `<i class="fa-solid fa-signature"></i>`, t("Menu.Rename")) : "")
+      + (entry.actorId ? btn("sheet", `<i class="fa-solid fa-id-card"></i>`, t("Menu.Sheet")) : "")
+      + btn("remove", `<i class="fa-solid fa-xmark"></i>`, t("Remove"), false, `data-danger`)
       + `</div>`;
     this.menu.addEventListener("click", event => {
       event.stopPropagation();
@@ -796,7 +804,7 @@ function injectControls() {
       const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
       if (data?.type !== "Actor") return;
       const actor = fromUuidSync(data.uuid);
-      if (!actor?.isOwner) return void ui.notifications.warn("Better Theater : ce personnage ne vous appartient pas.");
+      if (!actor?.isOwner) return void ui.notifications.warn(t("Notify.NotOwner"));
       if (!isStaged(actor)) request("addActor", { actorId: actor.id });
     });
     const before = controls.querySelector(".control-buttons");
@@ -813,8 +821,8 @@ function injectControls() {
     badge ??= button.appendChild(Object.assign(document.createElement("span"), { className: "bt-count" }));
     badge.textContent = count;
   } else badge?.remove();
-  const state = [count && `${count} main${count > 1 ? "s levées" : " levée"}`,
-    hidden && "masqué chez moi", curtain && "rideau baissé"].filter(Boolean).join(", ");
+  const state = [count && plural("Hand.Count", count),
+    hidden && t("State.Hidden"), curtain && t("State.Curtain")].filter(Boolean).join(", ");
   const tip = `Better Theater${state ? ` (${state})` : ""}`;
   button.classList.toggle("bt-alert", hidden || curtain);
   button.dataset.tooltip = tip;
@@ -828,7 +836,7 @@ function stageableActors() {
   const mine = game.user.character?.id;
   const rank = a => (a.id === mine ? 0 : a.hasPlayerOwner ? 1 : 2);
   return game.actors.filter(a => a.isOwner && !a.type.startsWith("_"))
-    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, "fr"));
+    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, game.i18n.lang));
 }
 
 const fold = s => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -889,7 +897,7 @@ const Panel = {
   // MJ : mains levées dans l'ordre de la file ; un clic donne la parole.
   handItems(stage) {
     if (!stage.hands.length) return "";
-    return `<div class="bt-label">Mains levées</div>`
+    return `<div class="bt-label">${t("Hand.Heading")}</div>`
       + stage.hands.map((h, i) => {
         const user = game.users.get(h.userId);
         const entry = handEntry(h, stage.entries);
@@ -897,7 +905,7 @@ const Panel = {
         const label = `${i + 1}. ${esc(user?.name ?? "?")}${name ? ` <small>${esc(name)}</small>` : ""}`;
         return this.item("floor", "fa-hand", label, { tail: "fa-microphone", user: h.userId });
       }).join("")
-      + this.item("lower-all", "fa-hand-back-fist", stage.hands.length > 1 ? "Baisser toutes les mains" : "Baisser la main")
+      + this.item("lower-all", "fa-hand-back-fist", t(stage.hands.length > 1 ? "Hand.LowerAll" : "Hand.Lower"))
       + `<div class="bt-sep"></div>`;
   },
 
@@ -909,31 +917,31 @@ const Panel = {
     if (this.view === "hand") {
       const user = game.users.get(this.userId);
       html = `<div class="bt-head"><i class="fa-solid fa-hand"></i><span>${esc(user?.name ?? "?")}</span></div>`
-        + this.item("floor", "fa-microphone", "Donner la parole", { user: this.userId })
-        + this.item("lower", "fa-hand-back-fist", "Baisser la main", { user: this.userId });
+        + this.item("floor", "fa-microphone", t("Hand.GiveFloor"), { user: this.userId })
+        + this.item("lower", "fa-hand-back-fist", t("Hand.Lower"), { user: this.userId });
     } else if (this.view === "actors") {
       const search = game.user.isGM || stageableActors().length > 8;
-      html = `<div class="bt-head"><button type="button" class="bt-back" data-act="back" aria-label="Retour"><i class="fa-solid fa-chevron-left"></i></button>`
-        + `<span>${game.user.isGM ? "Ajouter un personnage" : "Mes personnages"}</span></div>`
-        + (search ? `<input type="search" class="bt-search" placeholder="Rechercher…" value="${esc(this.query)}">` : "")
+      html = `<div class="bt-head"><button type="button" class="bt-back" data-act="back" aria-label="${t("Panel.Back")}"><i class="fa-solid fa-chevron-left"></i></button>`
+        + `<span>${t(game.user.isGM ? "Panel.AddCharacter" : "Panel.MyCharacters")}</span></div>`
+        + (search ? `<input type="search" class="bt-search" placeholder="${t("Panel.Search")}" value="${esc(this.query)}">` : "")
         + `<div class="bt-list"></div>`;
     } else if (game.user.isGM) {
       html = this.handItems(stage)
-        + this.item("image", "fa-image", "Ajouter une image")
-        + this.item("actors", "fa-user-plus", "Ajouter un personnage", { more: true })
-        + this.item("curtain", "fa-person-booth", "Masquer chez tout le monde", { on: stage.curtain })
-        + this.item("hide", "fa-eye-slash", "Masquer chez moi", { on: hidden })
-        + this.item("clear", "fa-trash", "Vider le théâtre", { danger: true, disabled: !stage.entries.length });
+        + this.item("image", "fa-image", t("Panel.AddImage"))
+        + this.item("actors", "fa-user-plus", t("Panel.AddCharacter"), { more: true })
+        + this.item("curtain", "fa-person-booth", t("Panel.Curtain"), { on: stage.curtain })
+        + this.item("hide", "fa-eye-slash", t("Panel.Hide"), { on: hidden })
+        + this.item("clear", "fa-trash", t("Panel.Clear"), { danger: true, disabled: !stage.entries.length });
     } else {
       const mine = stageableActors();
       const staged = mine.filter(isStaged);
       html = "";
-      if (mine.length === 1 && !staged.length) html += this.item("add", "fa-user-plus", `Ajouter ${esc(mine[0].name)}`);
+      if (mine.length === 1 && !staged.length) html += this.item("add", "fa-user-plus", t("Panel.AddName", { name: esc(mine[0].name) }));
       if (mine.length > 1) html += this.item("actors", "fa-user-plus",
-        staged.length < mine.length ? "Ajouter mon personnage" : "Mes personnages", { more: true });
-      html += this.item("hide", "fa-eye-slash", "Masquer chez moi", { on: hidden });
+        t(staged.length < mine.length ? "Panel.AddMyCharacter" : "Panel.MyCharacters"), { more: true });
+      html += this.item("hide", "fa-eye-slash", t("Panel.Hide"), { on: hidden });
       if (staged.length) html += this.item("remove-mine", "fa-user-minus",
-        staged.length > 1 ? `Retirer mes personnages (${staged.length})` : `Retirer ${esc(staged[0].name)}`, { danger: true });
+        staged.length > 1 ? t("Panel.RemoveMine", { count: staged.length }) : t("Panel.RemoveName", { name: esc(staged[0].name) }), { danger: true });
     }
     this.el.innerHTML = html;
     this.el.classList.toggle("bt-wide", this.view === "actors");
@@ -956,8 +964,8 @@ const Panel = {
         + `<img alt="" draggable="false"><span>${esc(a.name)}</span>`
         + `<i class="fa-solid ${on ? "fa-check" : "fa-plus"} bt-tail"></i></button>`;
     }).join("")
-      + (!found.length ? `<p class="bt-note">Aucun personnage.</p>` : "")
-      + (found.length > LIST_MAX ? `<p class="bt-note">${found.length - LIST_MAX} autres : précisez la recherche.</p>` : "");
+      + (!found.length ? `<p class="bt-note">${t("Panel.NoCharacter")}</p>` : "")
+      + (found.length > LIST_MAX ? `<p class="bt-note">${t("Panel.More", { count: found.length - LIST_MAX })}</p>` : "");
     // Vignettes tirées seulement quand la ligne apparaît : certaines images de fiche sont énormes.
     this.lazy = new IntersectionObserver(seen => {
       for (const { isIntersecting, target } of seen) {
@@ -1007,8 +1015,8 @@ const Panel = {
     else if (act === "remove-mine") mine.filter(isStaged).forEach(a => request("removeActor", { actorId: a.id }));
     else if (act === "clear") {
       const ok = await foundry.applications.api.DialogV2.confirm({
-        window: { title: "Vider le théâtre" },
-        content: "<p>Retirer tous les portraits du théâtre ?</p>",
+        window: { title: t("Clear.Title") },
+        content: `<p>${t("Clear.Content")}</p>`,
         rejectClose: false
       });
       if (ok) request("clear");
@@ -1047,41 +1055,42 @@ Hooks.once("init", () => {
   reg("max", {
     scope: "world", config: true, type: Number, default: 12,
     choices: { 8: "8", 10: "10", 12: "12", 16: "16" },
-    name: "Portraits affichés au maximum",
-    hint: "Au-delà, les images les plus anciennes du MJ se rangent dans une pastille « +N ». Les personnages joueurs restent toujours visibles.",
+    name: "BTHEATER.Settings.Max.Name",
+    hint: "BTHEATER.Settings.Max.Hint",
     onChange: () => Stage.render()
   });
   reg("bubbles", {
     scope: "world", config: true, type: Boolean, default: true,
-    name: "Bulles de répliques",
-    hint: "Une réplique écrite dans le chat par un personnage présent dans le théâtre s'affiche quelques secondes près de son portrait.",
+    name: "BTHEATER.Settings.Bubbles.Name",
+    hint: "BTHEATER.Settings.Bubbles.Hint",
   });
   reg("scale", {
     scope: "client", config: true, type: Number, default: 1,
-    choices: { 0.75: "Petits", 1: "Normaux", 1.25: "Grands" },
-    name: "Taille des portraits",
-    hint: "Sur cet ordinateur seulement.",
+    choices: { 0.75: "BTHEATER.Settings.Scale.Small", 1: "BTHEATER.Settings.Scale.Normal", 1.25: "BTHEATER.Settings.Scale.Large" },
+    name: "BTHEATER.Settings.Scale.Name",
+    hint: "BTHEATER.Settings.Scale.Hint",
     onChange: () => Stage.render()
   });
   reg("handSound", {
     scope: "client", config: true, type: Boolean, default: true,
-    name: "Son des mains levées",
-    hint: "Pour le MJ : un petit son quand un joueur lève la main (Alt+L ou menu de son portrait)."
+    name: "BTHEATER.Settings.HandSound.Name",
+    hint: "BTHEATER.Settings.HandSound.Hint"
   });
   reg("hidden", {
     scope: "client", type: Boolean, default: false,
     onChange: () => { Stage.render(); injectControls(); }
   });
 
+  // Réglages et raccourcis : Foundry traduit lui-même ces clés à l'affichage (les textes ne sont pas encore chargés à l'init).
   game.keybindings.register(ID, "toggle", {
-    name: "Masquer / afficher le théâtre",
-    hint: "Sur cet ordinateur seulement.",
+    name: "BTHEATER.Keys.Toggle.Name",
+    hint: "BTHEATER.Keys.Toggle.Hint",
     editable: [{ key: "KeyH", modifiers: ["Alt"] }],
     onDown: () => { game.settings.set(ID, "hidden", !setting("hidden")); return true; }
   });
   game.keybindings.register(ID, "hand", {
-    name: "Lever / baisser la main",
-    hint: "Joueurs : demander la parole au MJ. La main s'affiche sur le portrait et dans la liste des joueurs.",
+    name: "BTHEATER.Keys.Hand.Name",
+    hint: "BTHEATER.Keys.Hand.Hint",
     // Touche à la même place en AZERTY et QWERTY : Foundry lit la position physique (event.code), Alt+M
     // tombait sur la virgule des claviers français.
     editable: [{ key: "KeyL", modifiers: ["Alt"] }],
@@ -1164,7 +1173,7 @@ Hooks.on("getHeaderControlsDocumentSheetV2", (app, controls) => {
   controls.unshift({
     action: "betterTheater",
     icon: staged ? "fa-solid fa-mask" : "fa-solid fa-masks-theater",
-    label: staged ? "Retirer du théâtre" : "Ajouter au théâtre",
+    label: t(staged ? "Remove" : "Add"),
     onClick: () => toggleActor(actor)
   });
 });
@@ -1174,7 +1183,7 @@ Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
   const actor = app.document ?? app.actor;
   if (!actor?.isOwner) return;
   buttons.unshift({
-    label: "Théâtre",
+    label: t("Theater"),
     class: "bt-header",
     icon: "fa-solid fa-masks-theater",
     onclick: () => toggleActor(actor)
@@ -1185,12 +1194,12 @@ Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
 Hooks.on("getActorContextOptions", (app, options) => {
   const actorOfLi = li => game.actors.get((li?.[0] ?? li)?.closest?.("[data-entry-id]")?.dataset.entryId);
   options.push({
-    label: "Ajouter au théâtre",
+    label: t("Add"),
     icon: "fa-solid fa-masks-theater",
     visible: li => { const a = actorOfLi(li); return !!a?.isOwner && !isStaged(a); },
     onClick: (_event, li) => request("addActor", { actorId: actorOfLi(li)?.id })
   }, {
-    label: "Retirer du théâtre",
+    label: t("Remove"),
     icon: "fa-solid fa-mask",
     visible: li => { const a = actorOfLi(li); return !!a?.isOwner && isStaged(a); },
     onClick: (_event, li) => request("removeActor", { actorId: actorOfLi(li)?.id })
@@ -1209,7 +1218,7 @@ Hooks.on("renderTokenHUD", (hud, html) => {
   button.type = "button";
   button.classList.add("control-icon", "bt-hud-button");
   if (staged) button.classList.add("active");
-  button.dataset.tooltip = staged ? "Retirer du théâtre" : "Ajouter au théâtre";
+  button.dataset.tooltip = t(staged ? "Remove" : "Add");
   button.innerHTML = `<i class="fa-solid fa-masks-theater"></i>`;
   button.addEventListener("click", event => {
     event.preventDefault();

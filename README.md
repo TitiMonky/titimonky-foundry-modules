@@ -1,7 +1,7 @@
 # Modules Foundry VTT de TitiMonky
 
 Modules faits maison pour la campagne « Les Légendes de Meyiv », partagés tels quels.
-Testés sur **Foundry VTT v14** (minimum v13). Interface en français.
+Testés sur **Foundry VTT v14** (minimum v13). Interface en français (Better Theater : français et anglais).
 
 ## Installation
 

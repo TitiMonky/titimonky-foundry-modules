@@ -1,0 +1,104 @@
+{
+  "BTHEATER": {
+    "Ordinal": {
+      "one": "{n}st",
+      "two": "{n}nd",
+      "few": "{n}rd",
+      "other": "{n}th"
+    },
+    "Notify": {
+      "Floor": "Better Theater: the GM gives you the floor.",
+      "NeedGM": "Better Theater: the GM must be connected to change the theater.",
+      "NotOwner": "Better Theater: you don't own this character."
+    },
+    "Hand": {
+      "Raised": "Hand raised ({rank})",
+      "ClickLower": "Hand raised ({rank}): click to lower it",
+      "ClickChoose": "Hand raised ({rank}): give the floor or lower",
+      "Raise": "Raise hand",
+      "Lower": "Lower hand",
+      "LowerAll": "Lower all hands",
+      "GiveFloor": "Give the floor",
+      "GiveFloorTo": "Give the floor to {name}",
+      "Heading": "Raised hands",
+      "Count": {
+        "one": "{count} hand raised",
+        "other": "{count} hands raised"
+      }
+    },
+    "Rename": {
+      "Title": "Name shown in the theater",
+      "Placeholder": "Empty = character's name",
+      "Button": "Rename"
+    },
+    "Overflow": {
+      "one": "Tucked away: {names}",
+      "other": "Tucked away: {names}"
+    },
+    "Menu": {
+      "Emote": "Emotion",
+      "Mirror": "Mirror",
+      "Focus": "Spotlight",
+      "Rename": "Rename",
+      "Sheet": "Open sheet"
+    },
+    "Add": "Add to theater",
+    "Remove": "Remove from theater",
+    "Theater": "Theater",
+    "State": {
+      "Hidden": "hidden for me",
+      "Curtain": "curtain down"
+    },
+    "Panel": {
+      "Back": "Back",
+      "AddCharacter": "Add a character",
+      "MyCharacters": "My characters",
+      "AddMyCharacter": "Add my character",
+      "AddName": "Add {name}",
+      "RemoveName": "Remove {name}",
+      "RemoveMine": "Remove my characters ({count})",
+      "Search": "Search…",
+      "AddImage": "Add an image",
+      "Curtain": "Hide for everyone",
+      "Hide": "Hide for me",
+      "Clear": "Clear the theater",
+      "NoCharacter": "No characters.",
+      "More": "{count} more: refine your search."
+    },
+    "Clear": {
+      "Title": "Clear the theater",
+      "Content": "Remove all portraits from the theater?"
+    },
+    "Settings": {
+      "Max": {
+        "Name": "Maximum portraits shown",
+        "Hint": "Beyond this, the GM's oldest images are tucked into a \"+N\" badge. Player characters always stay visible."
+      },
+      "Bubbles": {
+        "Name": "Speech bubbles",
+        "Hint": "A line written in the chat by a character on stage appears for a few seconds next to their portrait."
+      },
+      "Scale": {
+        "Name": "Portrait size",
+        "Hint": "On this computer only.",
+        "Small": "Small",
+        "Normal": "Normal",
+        "Large": "Large"
+      },
+      "HandSound": {
+        "Name": "Raised hand sound",
+        "Hint": "For the GM: a short sound when a player raises their hand (Alt+L or their portrait menu)."
+      }
+    },
+    "Keys": {
+      "Toggle": {
+        "Name": "Hide / show the theater",
+        "Hint": "On this computer only."
+      },
+      "Hand": {
+        "Name": "Raise / lower hand",
+        "Hint": "Players: ask the GM for the floor. The hand shows on the portrait and in the players list."
+      }
+    }
+  }
+}

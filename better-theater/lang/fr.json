@@ -1,0 +1,102 @@
+{
+  "BTHEATER": {
+    "Ordinal": {
+      "one": "{n}ʳᵉ",
+      "other": "{n}ᵉ"
+    },
+    "Notify": {
+      "Floor": "Better Theater : le MJ vous donne la parole.",
+      "NeedGM": "Better Theater : le MJ doit être connecté pour modifier le théâtre.",
+      "NotOwner": "Better Theater : ce personnage ne vous appartient pas."
+    },
+    "Hand": {
+      "Raised": "Main levée ({rank})",
+      "ClickLower": "Main levée ({rank}) : cliquer pour la baisser",
+      "ClickChoose": "Main levée ({rank}) : donner la parole ou baisser",
+      "Raise": "Lever la main",
+      "Lower": "Baisser la main",
+      "LowerAll": "Baisser toutes les mains",
+      "GiveFloor": "Donner la parole",
+      "GiveFloorTo": "Donner la parole à {name}",
+      "Heading": "Mains levées",
+      "Count": {
+        "one": "{count} main levée",
+        "other": "{count} mains levées"
+      }
+    },
+    "Rename": {
+      "Title": "Nom affiché dans le théâtre",
+      "Placeholder": "Vide = nom de la fiche",
+      "Button": "Renommer"
+    },
+    "Overflow": {
+      "one": "Rangé : {names}",
+      "other": "Rangés : {names}"
+    },
+    "Menu": {
+      "Emote": "Émotion",
+      "Mirror": "Miroir",
+      "Focus": "Mettre en avant",
+      "Rename": "Renommer",
+      "Sheet": "Ouvrir la fiche"
+    },
+    "Add": "Ajouter au théâtre",
+    "Remove": "Retirer du théâtre",
+    "Theater": "Théâtre",
+    "State": {
+      "Hidden": "masqué chez moi",
+      "Curtain": "rideau baissé"
+    },
+    "Panel": {
+      "Back": "Retour",
+      "AddCharacter": "Ajouter un personnage",
+      "MyCharacters": "Mes personnages",
+      "AddMyCharacter": "Ajouter mon personnage",
+      "AddName": "Ajouter {name}",
+      "RemoveName": "Retirer {name}",
+      "RemoveMine": "Retirer mes personnages ({count})",
+      "Search": "Rechercher…",
+      "AddImage": "Ajouter une image",
+      "Curtain": "Masquer chez tout le monde",
+      "Hide": "Masquer chez moi",
+      "Clear": "Vider le théâtre",
+      "NoCharacter": "Aucun personnage.",
+      "More": "{count} autres : précisez la recherche."
+    },
+    "Clear": {
+      "Title": "Vider le théâtre",
+      "Content": "Retirer tous les portraits du théâtre ?"
+    },
+    "Settings": {
+      "Max": {
+        "Name": "Portraits affichés au maximum",
+        "Hint": "Au-delà, les images les plus anciennes du MJ se rangent dans une pastille « +N ». Les personnages joueurs restent toujours visibles."
+      },
+      "Bubbles": {
+        "Name": "Bulles de répliques",
+        "Hint": "Une réplique écrite dans le chat par un personnage présent dans le théâtre s'affiche quelques secondes près de son portrait."
+      },
+      "Scale": {
+        "Name": "Taille des portraits",
+        "Hint": "Sur cet ordinateur seulement.",
+        "Small": "Petits",
+        "Normal": "Normaux",
+        "Large": "Grands"
+      },
+      "HandSound": {
+        "Name": "Son des mains levées",
+        "Hint": "Pour le MJ : un petit son quand un joueur lève la main (Alt+L ou menu de son portrait)."
+      }
+    },
+    "Keys": {
+      "Toggle": {
+        "Name": "Masquer / afficher le théâtre",
+        "Hint": "Sur cet ordinateur seulement."
+      },
+      "Hand": {
+        "Name": "Lever / baisser la main",
+        "Hint": "Joueurs : demander la parole au MJ. La main s'affiche sur le portrait et dans la liste des joueurs."
+      }
+    }
+  }
+}
