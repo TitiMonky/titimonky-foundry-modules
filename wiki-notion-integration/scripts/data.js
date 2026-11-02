@@ -1,5 +1,5 @@
 // Données de Wiki Notion Integration : le type de page de journal « Notion », l'index de recherche et l'arborescence du wiki.
-export const ID = "notion-pages";
+export const ID = "wiki-notion-integration";
 export const TYPE = `${ID}.notion`;
 
 export const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);

@@ -28,7 +28,7 @@ const Pill = {
     const el = document.createElement("button");
     el.type = "button";
     el.id = "np-pill";
-    el.className = "notion-pages np-ui np-pill";
+    el.className = "wiki-notion-integration np-ui np-pill";
     el.innerHTML = `<i class="fa-solid fa-book-open"></i><span>Wiki</span>`;
     el.setAttribute("aria-label", "Wiki : chercher une page (Alt+N)");
     document.body.append(el);
@@ -98,7 +98,7 @@ const Tip = {
     if (page?.type !== TYPE || !canView(page)) return this.hide();
     this.noteId = note.document.id;
     const item = getIndex().items.find(i => i.page === page);
-    this.el ??= Object.assign(document.createElement("div"), { className: "notion-pages np-ui np-tip" });
+    this.el ??= Object.assign(document.createElement("div"), { className: "wiki-notion-integration np-ui np-tip" });
     const text = item?.excerptSource.slice(0, 150) ?? "";
     this.el.innerHTML = `${item?.path.length ? `<span class="np-tip-c">${esc(item.path.slice(-2).join(" › "))}</span>` : ""}
       <b>${page.system.icon ? esc(page.system.icon) + " " : ""}${esc(page.name)}</b>

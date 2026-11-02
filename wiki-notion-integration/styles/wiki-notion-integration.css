@@ -1,13 +1,13 @@
 /* =====================================================================
    Wiki Notion Integration : DA des Légendes de Meyiv (copie des seules variables utiles de la palette, pour marcher seul).
-   .np-ui = éléments hors fenêtre (pastille, menu, infobulle) ; .application.notion-pages = fenêtres.
+   .np-ui = éléments hors fenêtre (pastille, menu, infobulle) ; .application.wiki-notion-integration = fenêtres.
    ===================================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
 
 /* Palette claire par défaut. Sombre : thème Meyiv sur Sombre (body.jdr-dark), ou « Suivre Foundry » / système absent
    quand Foundry est en thème sombre. */
 .np-ui,
-.application.notion-pages {
+.application.wiki-notion-integration {
   --jdr-vellum: #f6f1e6;
   --jdr-field: #fffaf0;
   --jdr-input: #fffaf0;
@@ -40,10 +40,10 @@
   --jdr-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
 }
 body.jdr-dark .np-ui,
-body.jdr-dark .application.notion-pages,
+body.jdr-dark .application.wiki-notion-integration,
 body:not(.jdr-light):not(.jdr-dark):has(#interface.theme-dark) .np-ui,
 body:not(.jdr-light):not(.jdr-dark).theme-dark .np-ui,
-body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages {
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.wiki-notion-integration {
   --jdr-vellum: #1b1b1e;
   --jdr-field: #242428;
   --jdr-input: #111113;
@@ -76,42 +76,42 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages {
 }
 
 /* ---------------------------------------------------------------- fenêtres */
-.application.notion-pages { font-family: var(--jdr-body); color: var(--jdr-text); }
+.application.wiki-notion-integration { font-family: var(--jdr-body); color: var(--jdr-text); }
 /* Fond posé dans les deux thèmes : en clair choisi alors que Foundry est en sombre, la fenêtre garderait sinon le fond
    sombre de Foundry sous une encre foncée (illisible). */
-.application.notion-pages .window-content { background: linear-gradient(#efe6d2, #e6dbc4); color: var(--jdr-text); }
-.application.notion-pages .window-header { background: #2a221d; color: #f6f1e6; }
-body.jdr-dark .application.notion-pages .window-content,
-body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window-content {
+.application.wiki-notion-integration .window-content { background: linear-gradient(#efe6d2, #e6dbc4); color: var(--jdr-text); }
+.application.wiki-notion-integration .window-header { background: #2a221d; color: #f6f1e6; }
+body.jdr-dark .application.wiki-notion-integration .window-content,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.wiki-notion-integration .window-content {
   background: var(--jdr-grain), radial-gradient(130% 90% at 50% 0%, #1d1d20, #121214 70%);
 }
-body.jdr-dark .application.notion-pages .window-header,
-body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window-header {
+body.jdr-dark .application.wiki-notion-integration .window-header,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.wiki-notion-integration .window-header {
   background: #0d0d0f;
   color: var(--jdr-ink);
   border-bottom: 1px solid var(--jdr-rule);
 }
-.application.notion-pages .window-title { font-family: var(--jdr-display); }
+.application.wiki-notion-integration .window-title { font-family: var(--jdr-display); }
 
-.notion-pages .np-btn {
+.wiki-notion-integration .np-btn {
   display: inline-flex; align-items: center; gap: 6px; flex: none; width: auto; min-height: 0; height: 30px;
   padding: 0 11px; border: 0; border-radius: 6px; background: var(--jdr-btn); color: var(--jdr-btn-ink);
   font: 700 13px var(--jdr-body); cursor: pointer; text-decoration: none; white-space: nowrap;
 }
-.notion-pages .np-btn:hover { background: var(--jdr-btn-hover); color: var(--jdr-btn-ink); box-shadow: none; }
-.notion-pages .np-btn:disabled { opacity: .5; cursor: default; }
-.notion-pages .np-btn.ghost { background: none; color: var(--jdr-text); border: 1px solid var(--jdr-rule); }
-.notion-pages .np-btn.ghost:hover { border-color: var(--jdr-ink-soft); color: var(--jdr-text-hover); }
-.notion-pages .np-ibtn {
+.wiki-notion-integration .np-btn:hover { background: var(--jdr-btn-hover); color: var(--jdr-btn-ink); box-shadow: none; }
+.wiki-notion-integration .np-btn:disabled { opacity: .5; cursor: default; }
+.wiki-notion-integration .np-btn.ghost { background: none; color: var(--jdr-text); border: 1px solid var(--jdr-rule); }
+.wiki-notion-integration .np-btn.ghost:hover { border-color: var(--jdr-ink-soft); color: var(--jdr-text-hover); }
+.wiki-notion-integration .np-ibtn {
   display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; min-height: 0 !important; padding: 0;
   border: 0; border-radius: 6px; background: none; color: var(--jdr-ink-soft); cursor: pointer; line-height: 1;
 }
-.notion-pages .np-ibtn:hover { color: var(--jdr-accent); background: var(--jdr-hover); box-shadow: none; }
-.notion-pages .np-ibtn.is-off { color: var(--jdr-hidden); }
-.notion-pages .np-soft { color: var(--jdr-ink-soft); font-size: 12.5px; }
-.notion-pages .np-emoji { margin-right: 5px; }
-.notion-pages .np-empty, .notion-pages .np-more { padding: 22px 10px; text-align: center; color: var(--jdr-ink-soft); }
-.notion-pages .np-more { padding: 10px; font-size: 12.5px; }
+.wiki-notion-integration .np-ibtn:hover { color: var(--jdr-accent); background: var(--jdr-hover); box-shadow: none; }
+.wiki-notion-integration .np-ibtn.is-off { color: var(--jdr-hidden); }
+.wiki-notion-integration .np-soft { color: var(--jdr-ink-soft); font-size: 12.5px; }
+.wiki-notion-integration .np-emoji { margin-right: 5px; }
+.wiki-notion-integration .np-empty, .wiki-notion-integration .np-more { padding: 22px 10px; text-align: center; color: var(--jdr-ink-soft); }
+.wiki-notion-integration .np-more { padding: 10px; font-size: 12.5px; }
 
 /* ------------------------------------------------------------ bibliothèque */
 .application.np-library .window-content { padding: 10px; overflow: hidden; }
@@ -154,8 +154,8 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window
 .np-pin-more { color: var(--jdr-ink-soft); font-size: 12px; }
 .np-sec-hint { padding: 0 6px 2px 23px; font-size: 12px; color: var(--jdr-ink-soft); }
 .np-sec-rule { height: 1px; margin: 4px 4px 8px; background: var(--jdr-rule); }
-.notion-pages .np-star.is-on, .notion-pages .np-star.is-on:hover { color: var(--jdr-gilt); }
-.notion-pages .np-heart.is-on, .notion-pages .np-heart.is-on:hover { color: var(--jdr-heart); }
+.wiki-notion-integration .np-star.is-on, .wiki-notion-integration .np-star.is-on:hover { color: var(--jdr-gilt); }
+.wiki-notion-integration .np-heart.is-on, .wiki-notion-integration .np-heart.is-on:hover { color: var(--jdr-heart); }
 
 .np-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 .np-count { margin: 0 2px 4px; font-size: 12px; color: var(--jdr-ink-soft); }
@@ -209,15 +209,15 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window
 /* --------------------------------------------------------------- import */
 .application.np-import .window-content { padding: 10px; }
 .np-imp { display: flex; flex-direction: column; gap: 10px; }
-.notion-pages .np-card {
+.wiki-notion-integration .np-card {
   padding: 10px 12px; border: 1px solid var(--jdr-card-rule); border-radius: 8px; background: var(--jdr-vellum);
   box-shadow: var(--jdr-lift);
 }
-.notion-pages .np-card h3 {
+.wiki-notion-integration .np-card h3 {
   margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--jdr-rule);
   font: 700 15px var(--jdr-display); color: var(--jdr-accent);
 }
-.notion-pages .np-card p { margin: 8px 0 0; }
+.wiki-notion-integration .np-card p { margin: 8px 0 0; }
 .np-file { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .np-file label.np-btn { cursor: pointer; }
 .np-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -234,7 +234,7 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window
 .np-parts label small { color: var(--jdr-ink-soft); }
 .np-parts label.is-off span { text-decoration: line-through; color: var(--jdr-ink-soft); }
 .np-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.notion-pages a[data-act] { color: var(--jdr-accent); cursor: pointer; text-decoration: underline; }
+.wiki-notion-integration a[data-act] { color: var(--jdr-accent); cursor: pointer; text-decoration: underline; }
 
 /* ----------------------------------------------------------- collecteur */
 .np-coll p, .np-coll ol { margin: 0 0 10px; }

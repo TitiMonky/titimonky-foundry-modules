@@ -9,7 +9,7 @@ export const SOCKET = `module.${ID}`;
 class NotionViewer extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: APP_ID,
-    classes: ["notion-pages", "np-viewer"],
+    classes: ["wiki-notion-integration", "np-viewer"],
     window: { title: "Wiki", icon: "fa-solid fa-book-open", resizable: true },
     position: { width: 860, height: 720 }
   };

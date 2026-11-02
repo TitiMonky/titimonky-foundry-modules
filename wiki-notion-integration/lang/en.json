@@ -1,7 +1,7 @@
 {
   "TYPES": {
     "JournalEntryPage": {
-      "notion-pages": {
+      "wiki-notion-integration": {
         "notion": "Notion page"
       }
     }

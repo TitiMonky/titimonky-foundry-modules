@@ -5,7 +5,7 @@ const { JournalEntryPageHandlebarsSheet } = foundry.applications.sheets.journal;
 
 export class NotionPageSheet extends JournalEntryPageHandlebarsSheet {
   static DEFAULT_OPTIONS = {
-    classes: ["notion-pages", "np-page-sheet"],
+    classes: ["wiki-notion-integration", "np-page-sheet"],
     window: { icon: "fa-solid fa-book-open" }
   };
 
@@ -41,7 +41,7 @@ export class NotionPageSheet extends JournalEntryPageHandlebarsSheet {
         formData.object["system.site"] = parsed.site;
         formData.object["system.notionId"] = parsed.id;
         const name = String(formData.object.name ?? "").trim();
-        if (!name || name === game.i18n.localize("TYPES.JournalEntryPage.notion-pages.notion")) {
+        if (!name || name === game.i18n.localize("TYPES.JournalEntryPage.wiki-notion-integration.notion")) {
           formData.object.name = titleFromUrl(link) || name;
         }
       } else if (String(link).trim()) {

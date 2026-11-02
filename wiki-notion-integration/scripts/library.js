@@ -25,7 +25,7 @@ const SHELL = () => `<div class="np-lib">
 class LibraryApp extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: APP_ID,
-    classes: ["notion-pages", "np-library"],
+    classes: ["wiki-notion-integration", "np-library"],
     window: { title: "Wiki", icon: "fa-solid fa-book-open", resizable: true },
     position: { width: 860, height: 640 }
   };
@@ -219,7 +219,7 @@ function closeMenu() { menuEl?.remove(); menuEl = null; }
 function showMenu(items, x, y, alignRight = false) {
   closeMenu();
   menuEl = document.createElement("div");
-  menuEl.className = "notion-pages np-ui np-menu";
+  menuEl.className = "wiki-notion-integration np-ui np-menu";
   menuEl.innerHTML = items.map((it, i) => it.sep ? `<hr>`
     : `<button type="button" data-i="${i}"><i class="${it.icon.includes(" ") ? it.icon : `fa-solid ${it.icon}`}"></i>${esc(it.label)}</button>`).join("");
   document.body.append(menuEl);

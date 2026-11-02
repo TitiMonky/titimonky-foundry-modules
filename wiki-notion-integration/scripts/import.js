@@ -3,6 +3,7 @@
 import { ID, TYPE, esc, shortId, parseNotionUrl, titleFromUrl } from "./data.js";
 
 const { ApplicationV2, DialogV2 } = foundry.applications.api;
+// Nom d'origine du module (avant le 2026-11-02), gardé : les fichiers déjà collectés restent lisibles.
 const FORMAT = "notion-pages-wiki";
 
 /* -------------------------------------------------------------- analyse */
@@ -114,7 +115,7 @@ function diff(wiki, pages, entry) {
 class ImportApp extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "np-import",
-    classes: ["notion-pages", "np-import"],
+    classes: ["wiki-notion-integration", "np-import"],
     window: { title: "Importer le wiki", icon: "fa-solid fa-file-import", resizable: true },
     position: { width: 620, height: "auto" }
   };
@@ -288,7 +289,7 @@ export async function openCollector() {
   const bookmarklet = `javascript:${encodeURIComponent(code.replace(/^\s*\/\/.*$/gm, "").trim())}`;
   await DialogV2.wait({
     window: { title: "Installer le collecteur", icon: "fa-solid fa-bookmark" },
-    classes: ["notion-pages", "np-collector"],
+    classes: ["wiki-notion-integration", "np-collector"],
     position: { width: 560 },
     content: `<div class="np-coll">
       <p>Le collecteur est un <b>favori</b> qui lit votre site Notion publié et télécharge le fichier à importer ici.
@@ -327,7 +328,7 @@ export async function openAddPage() {
   if (!game.user.isGM) return;
   const result = await DialogV2.input({
     window: { title: "Ajouter une page Notion", icon: "fa-solid fa-plus" },
-    classes: ["notion-pages"],
+    classes: ["wiki-notion-integration"],
     position: { width: 520 },
     content: `<div class="np-add">
       <div class="form-group"><label>Lien publié</label><div class="form-fields"><input type="url" name="link" required placeholder="https://monsite.notion.site/Ma-page-0123…"></div></div>

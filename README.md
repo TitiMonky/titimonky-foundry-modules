@@ -17,7 +17,7 @@ puis **Installer**. Les mises à jour arrivent ensuite par le bouton habituel de
 | **APNG Cut-in** | Cut-ins plein écran (APNG, GIF, WebP, WebM, avec son) lancés par le MJ ; animation sur résultat de jet chez le joueur qui lance. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/apng-cutin/module.json` |
 | **Quick Attack FX** | Bouton ATTAQUE dans le HUD du jeton : animations JB2A via Sequencer, sur les cibles ou le jeton. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/attaque-fx/module.json` |
 | **Better Scene Preview** | MJ : survoler une scène dans la barre de navigation affiche sa miniature et son nom complet. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/apercu-scenes/module.json` |
-| **Wiki Notion Integration** | Votre wiki Notion publié dans Foundry : bibliothèque avec sommaire (qui suit vos pages et vues liées) et recherche, pages « à la une » choisies par le MJ, favoris de chacun, page Notion affichée dans une fenêtre, montrée aux joueurs ou épinglée sur une scène. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/notion-pages/module.json` |
+| **Wiki Notion Integration** | Votre wiki Notion publié dans Foundry : bibliothèque avec sommaire (qui suit vos pages et vues liées) et recherche, pages « à la une » choisies par le MJ, favoris de chacun, page Notion affichée dans une fenêtre, montrée aux joueurs ou épinglée sur une scène. | `https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/wiki-notion-integration/module.json` |
 
 ## Bon à savoir
 
