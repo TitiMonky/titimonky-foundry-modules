@@ -30,7 +30,8 @@ jobs:
               continue
             fi
             rm -f "$id.zip"
-            (cd "$dir" && zip -rq "../$id.zip" . -x '.*')
+            # media/ = captures du README : utiles sur GitHub, inutiles dans Foundry
+            (cd "$dir" && zip -rq "../$id.zip" . -x '.*' -x 'media/*')
             gh release create "$tag" "$id.zip" "$manifest" --title "$title $version" --latest=false \
               --notes "Installation dans Foundry : Modules complémentaires → Installer un module → coller le lien du manifeste : https://raw.githubusercontent.com/${{ github.repository }}/main/$id/module.json"
             echo "$tag : publiée"

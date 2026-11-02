@@ -6,6 +6,8 @@ circle of storytellers around the table, and they never get in the way: clicks g
 Player characters stand on the left and right sides; images added by the GM (NPCs, creatures, places…) take the
 top of the circle. Everyone at the table sees the same circle, adapted to their own screen.
 
+![Portraits on stage: a player has raised their hand, another character shows an emotion](media/raise-hand-emotion.png)
+
 Available in **English** and **French**.
 
 ## Putting someone on stage
@@ -28,6 +30,8 @@ before, the portraits you chose there are picked up automatically.
   - **open the sheet**, or **remove** the character from the theater.
 - **Hide for me**: hides the theater on your screen only (Alt+H). Nobody else is affected.
 
+![The theater menu for a player](media/player-menu.png)
+
 Players can only change their own characters. Other portraits stay out of their way and let clicks through.
 
 ## For the GM
@@ -45,7 +49,10 @@ Players can only change their own characters. Other portraits stay out of their 
 ## Speech bubbles
 
 When a character on stage speaks in the chat, their line appears for a few seconds in a bubble next to their
-portrait, and the portrait lights up while they talk. Dice rolls and out-of-character messages don't make bubbles.
+portrait, and the portrait lights up while they talk. Just type in the chat as usual: the line is spoken by the
+token you have selected, or else by your own character.
+
+No bubble for dice rolls, private messages, or lines sent with `/ooc` (out of character).
 
 ## Raise your hand
 

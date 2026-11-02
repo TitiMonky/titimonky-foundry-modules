@@ -1026,12 +1026,20 @@ const Panel = {
 
 /* ------------------------------------------------------------- bulles */
 
-// Réplique dite par un personnage du théâtre : texte simple, ni jet ni carte de fiche, hors HRP.
+// Foundry v14 envoie par défaut en mode « Public », classé hors personnage et sans orateur : c'est pourtant ce que
+// les joueurs tapent pour faire parler leur personnage (choix de Théo : ces lignes font des bulles). Chez l'auteur,
+// avant l'envoi, on retient donc le personnage qui parle (jeton sélectionné, sinon personnage attitré). /ooc n'en
+// fait pas : c'est le seul vrai hors-personnage.
+function onChatInput(chat, text, chatData) {
+  const [command] = chat.constructor.parse(text);
+  if (command === "none" && chatData.speaker?.actor) foundry.utils.setProperty(chatData, `flags.${ID}.speaker`, chatData.speaker.actor);
+}
+
+// Réplique dite par un personnage du théâtre : texte simple, ni jet ni carte de fiche, ni message privé, hors /ooc.
 function onChatMessage(message) {
-  if (!setting("bubbles") || !message.visible || message.isRoll) return;
+  if (!setting("bubbles") || !message.visible || message.isRoll || message.whisper?.length) return;
   const styles = CONST.CHAT_MESSAGE_STYLES;
-  if (message.style === styles.OOC) return;
-  const actorId = message.speaker?.actor;
+  const actorId = message.style === styles.OOC ? message.flags?.[ID]?.speaker : message.speaker?.actor;
   const entry = actorId && readStage().entries.find(e => e.actorId === actorId);
   if (!entry) return;
   const html = String(message.content ?? "");
@@ -1153,6 +1161,7 @@ Hooks.on("collapseSidebar", () => {
 });
 Hooks.on("canvasReady", () => Stage.render());
 Hooks.on("clientSettingChanged", key => { if (key === "core.performanceMode") Stage.render(); });
+Hooks.on("chatMessage", onChatInput);
 Hooks.on("createChatMessage", onChatMessage);
 Hooks.on("renderPlayers", () => decoratePlayers());
 // Un joueur qui part baisse sa main.
