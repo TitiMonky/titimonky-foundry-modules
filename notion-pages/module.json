@@ -1,0 +1,43 @@
+{
+  "id": "notion-pages",
+  "title": "Wiki Notion Integration",
+  "description": "Your published Notion wiki inside Foundry: a draggable \"Wiki\" button opens a library with a table of contents that follows your Notion pages and linked views, keyword search, GM \"featured\" pages and per-player favorites. Notion pages open in a viewer, can be shown to players and pinned on scenes. Manual sync: a bookmarklet collects your published site, the GM imports the file. No server, no API key.",
+  "authors": [
+    {
+      "name": "TitiMonky",
+      "url": "https://github.com/TitiMonky"
+    }
+  ],
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/notion-pages.css"
+  ],
+  "languages": [
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    },
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "JournalEntryPage": {
+      "notion": {}
+    }
+  },
+  "socket": true,
+  "url": "https://github.com/TitiMonky/titimonky-foundry-modules",
+  "manifest": "https://raw.githubusercontent.com/TitiMonky/titimonky-foundry-modules/main/notion-pages/module.json",
+  "download": "https://github.com/TitiMonky/titimonky-foundry-modules/releases/download/notion-pages-v1.0.0/notion-pages.zip"
+}

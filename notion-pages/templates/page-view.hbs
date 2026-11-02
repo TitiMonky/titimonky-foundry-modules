@@ -1,0 +1,13 @@
+<div class="np-page">
+  {{#if title.show}}
+  <header class="journal-page-header">
+    <h{{ title.level }}>{{#if icon}}<span class="np-emoji">{{icon}}</span> {{/if}}{{ name }}</h{{ title.level }}>
+  </header>
+  {{/if}}
+  {{#if embed}}
+  <div class="np-frame"><span class="np-loading"><i class="fa-solid fa-spinner fa-spin"></i> Chargement de la page Notion…</span><iframe src="{{embed}}" loading="lazy" allowfullscreen></iframe></div>
+  <p class="np-open"><a href="{{link}}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir dans Notion</a></p>
+  {{else}}
+  <p class="np-empty">Pas encore de lien Notion : passez la page en édition et collez le lien publié.</p>
+  {{/if}}
+</div>

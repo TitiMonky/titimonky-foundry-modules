@@ -1,0 +1,9 @@
+{
+  "TYPES": {
+    "JournalEntryPage": {
+      "notion-pages": {
+        "notion": "Page Notion"
+      }
+    }
+  }
+}

@@ -1,0 +1,287 @@
+/* =====================================================================
+   Wiki Notion Integration : DA des Légendes de Meyiv (copie des seules variables utiles de la palette, pour marcher seul).
+   .np-ui = éléments hors fenêtre (pastille, menu, infobulle) ; .application.notion-pages = fenêtres.
+   ===================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
+
+/* Palette claire par défaut. Sombre : thème Meyiv sur Sombre (body.jdr-dark), ou « Suivre Foundry » / système absent
+   quand Foundry est en thème sombre. */
+.np-ui,
+.application.notion-pages {
+  --jdr-vellum: #f6f1e6;
+  --jdr-field: #fffaf0;
+  --jdr-input: #fffaf0;
+  --jdr-chip: #efe6d4;
+  --jdr-chip-2: #f3ecdf;
+  --jdr-ink: #2a221d;
+  --jdr-text: #2a221d;
+  --jdr-text-hover: #2a221d;
+  --jdr-ink-soft: #6b5d52;
+  --jdr-rule: #cdbfa6;
+  --jdr-card-rule: #cdbfa6;
+  --jdr-row-rule: rgba(205, 191, 166, .55);
+  --jdr-hover: rgba(125, 31, 36, .06);
+  --jdr-accent: #7d1f24;
+  --jdr-btn: #7d1f24;
+  --jdr-btn-hover: #5c1519;
+  --jdr-btn-ink: #fff;
+  --jdr-gilt: #a8823a;
+  --jdr-mark: rgba(168, 130, 58, .28);
+  --jdr-hidden: #9b8f80;
+  --jdr-ok: #3f7d3a;
+  --jdr-new: #1f5fd1;
+  --jdr-del: #c0262d;
+  --jdr-heart: #b8323f;
+  --jdr-shadow: rgba(42, 34, 29, .45);
+  --jdr-input-shadow: none;
+  --jdr-lift: inset 0 0 0 transparent;
+  --jdr-grain: none;
+  --jdr-display: "Alegreya SC", "Modesto Condensed", "Palatino Linotype", Georgia, serif;
+  --jdr-body: "Alegreya Sans", "Signika", "Segoe UI", sans-serif;
+}
+body.jdr-dark .np-ui,
+body.jdr-dark .application.notion-pages,
+body:not(.jdr-light):not(.jdr-dark):has(#interface.theme-dark) .np-ui,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .np-ui,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages {
+  --jdr-vellum: #1b1b1e;
+  --jdr-field: #242428;
+  --jdr-input: #111113;
+  --jdr-chip: #2c2c31;
+  --jdr-chip-2: #151517;
+  --jdr-ink: #f2f2f3;
+  --jdr-text: #dcdce0;
+  --jdr-text-hover: #fff;
+  --jdr-ink-soft: #a8a8ae;
+  --jdr-rule: #34343a;
+  --jdr-card-rule: #3c3c43;
+  --jdr-row-rule: rgba(255, 255, 255, .06);
+  --jdr-hover: rgba(255, 255, 255, .045);
+  --jdr-accent: #e3bd6b;
+  --jdr-btn: #a3263a;
+  --jdr-btn-hover: #bd3047;
+  --jdr-btn-ink: #fff;
+  --jdr-gilt: #cfa95e;
+  --jdr-mark: rgba(227, 189, 107, .25);
+  --jdr-hidden: #6e6e75;
+  --jdr-ok: #85d6a0;
+  --jdr-new: #79abff;
+  --jdr-del: #ff7070;
+  --jdr-heart: #ff7a8a;
+  --jdr-shadow: rgba(0, 0, 0, .7);
+  --jdr-input-shadow: inset 0 1px 2px rgba(0, 0, 0, .35);
+  --jdr-lift: inset 0 1px 0 rgba(255, 255, 255, .04);
+  --jdr-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .16 0 0 0 -.064'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- fenêtres */
+.application.notion-pages { font-family: var(--jdr-body); color: var(--jdr-text); }
+/* Fond posé dans les deux thèmes : en clair choisi alors que Foundry est en sombre, la fenêtre garderait sinon le fond
+   sombre de Foundry sous une encre foncée (illisible). */
+.application.notion-pages .window-content { background: linear-gradient(#efe6d2, #e6dbc4); color: var(--jdr-text); }
+.application.notion-pages .window-header { background: #2a221d; color: #f6f1e6; }
+body.jdr-dark .application.notion-pages .window-content,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window-content {
+  background: var(--jdr-grain), radial-gradient(130% 90% at 50% 0%, #1d1d20, #121214 70%);
+}
+body.jdr-dark .application.notion-pages .window-header,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .application.notion-pages .window-header {
+  background: #0d0d0f;
+  color: var(--jdr-ink);
+  border-bottom: 1px solid var(--jdr-rule);
+}
+.application.notion-pages .window-title { font-family: var(--jdr-display); }
+
+.notion-pages .np-btn {
+  display: inline-flex; align-items: center; gap: 6px; flex: none; width: auto; min-height: 0; height: 30px;
+  padding: 0 11px; border: 0; border-radius: 6px; background: var(--jdr-btn); color: var(--jdr-btn-ink);
+  font: 700 13px var(--jdr-body); cursor: pointer; text-decoration: none; white-space: nowrap;
+}
+.notion-pages .np-btn:hover { background: var(--jdr-btn-hover); color: var(--jdr-btn-ink); box-shadow: none; }
+.notion-pages .np-btn:disabled { opacity: .5; cursor: default; }
+.notion-pages .np-btn.ghost { background: none; color: var(--jdr-text); border: 1px solid var(--jdr-rule); }
+.notion-pages .np-btn.ghost:hover { border-color: var(--jdr-ink-soft); color: var(--jdr-text-hover); }
+.notion-pages .np-ibtn {
+  display: inline-grid; place-items: center; flex: none; width: 28px; height: 28px; min-height: 0 !important; padding: 0;
+  border: 0; border-radius: 6px; background: none; color: var(--jdr-ink-soft); cursor: pointer; line-height: 1;
+}
+.notion-pages .np-ibtn:hover { color: var(--jdr-accent); background: var(--jdr-hover); box-shadow: none; }
+.notion-pages .np-ibtn.is-off { color: var(--jdr-hidden); }
+.notion-pages .np-soft { color: var(--jdr-ink-soft); font-size: 12.5px; }
+.notion-pages .np-emoji { margin-right: 5px; }
+.notion-pages .np-empty, .notion-pages .np-more { padding: 22px 10px; text-align: center; color: var(--jdr-ink-soft); }
+.notion-pages .np-more { padding: 10px; font-size: 12.5px; }
+
+/* ------------------------------------------------------------ bibliothèque */
+.application.np-library .window-content { padding: 10px; overflow: hidden; }
+.np-lib { display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 0; }
+.np-top { display: flex; gap: 6px; align-items: center; }
+.np-search {
+  flex: 1; display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border: 1px solid var(--jdr-rule);
+  border-radius: 6px; background: var(--jdr-input); box-shadow: var(--jdr-input-shadow); cursor: text;
+}
+.np-search:focus-within { border-color: var(--jdr-gilt); }
+.np-search > i { color: var(--jdr-ink-soft); }
+.np-search input, .np-search input:focus {
+  flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; box-shadow: none; background: none;
+  color: var(--jdr-ink); font: 500 14.5px var(--jdr-body);
+}
+.np-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(170px, 34%) 1fr; gap: 10px; }
+.np-toc { overflow: auto; padding-right: 8px; border-right: 1px solid var(--jdr-rule); }
+.np-tn a {
+  display: flex; align-items: baseline; gap: 4px; padding: 3px 6px; border-radius: 6px; color: var(--jdr-text);
+  font-size: 13.5px; line-height: 1.3; cursor: pointer; text-decoration: none;
+}
+.np-tn a:hover { background: var(--jdr-hover); color: var(--jdr-text-hover); text-shadow: none; }
+.np-tn a.on { background: var(--jdr-mark); color: var(--jdr-ink); font-weight: 700; }
+.np-tn a small { flex: none; color: var(--jdr-ink-soft); font-weight: 500; }
+.np-tl { flex: 1; min-width: 0; }
+.np-tw { flex: none; width: 12px; font-size: 9px; text-align: center; color: var(--jdr-ink-soft); }
+.np-tw[data-tw]:hover { color: var(--jdr-accent); }
+.np-ti { margin-right: 5px; font-size: 11px; color: var(--jdr-gilt); }
+/* À la une / Mes favoris, au-dessus de l'arborescence */
+.np-sec { margin-bottom: 6px; }
+.np-sec-h { font-family: var(--jdr-display) !important; font-weight: 700; letter-spacing: .02em; }
+.np-sec.is-featured .np-sec-h .np-ti { color: var(--jdr-gilt); }
+.np-sec.is-favorite .np-sec-h .np-ti { color: var(--jdr-heart); }
+.np-pin {
+  display: flex; align-items: baseline; gap: 2px; padding: 2px 6px 2px 23px; border-radius: 6px;
+  color: var(--jdr-text); font-size: 13px; line-height: 1.3; cursor: pointer; text-decoration: none;
+}
+.np-pin:hover { background: var(--jdr-hover); color: var(--jdr-text-hover); text-shadow: none; }
+.np-pin.is-hidden .np-tl { color: var(--jdr-hidden); }
+.np-pin-more { color: var(--jdr-ink-soft); font-size: 12px; }
+.np-sec-hint { padding: 0 6px 2px 23px; font-size: 12px; color: var(--jdr-ink-soft); }
+.np-sec-rule { height: 1px; margin: 4px 4px 8px; background: var(--jdr-rule); }
+.notion-pages .np-star.is-on, .notion-pages .np-star.is-on:hover { color: var(--jdr-gilt); }
+.notion-pages .np-heart.is-on, .notion-pages .np-heart.is-on:hover { color: var(--jdr-heart); }
+
+.np-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.np-count { margin: 0 2px 4px; font-size: 12px; color: var(--jdr-ink-soft); }
+.np-list { flex: 1; overflow: auto; padding-right: 2px; }
+.np-res {
+  display: grid; grid-template-columns: 28px 1fr auto; gap: 2px 10px; align-items: start; padding: 7px 8px;
+  border-bottom: 1px solid var(--jdr-row-rule); border-radius: 6px; cursor: pointer;
+}
+.np-res:hover { background: var(--jdr-hover); }
+.np-res:hover .np-t { color: var(--jdr-text-hover); }
+.np-ic {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: var(--jdr-chip-2);
+  font-size: 17px; color: var(--jdr-ink-soft);
+}
+.np-ic .fa-file-lines { font-size: 13px; }
+.np-t { font: 700 14.5px var(--jdr-body); color: var(--jdr-ink); }
+.np-c { font-size: 12px; color: var(--jdr-ink-soft); }
+.np-gm { display: flex; gap: 2px; }
+.np-x {
+  grid-column: 2 / 4; font-size: 12.5px; color: var(--jdr-ink-soft); overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.np-res mark { background: var(--jdr-mark); color: inherit; border-radius: 2px; padding: 0 1px; }
+.np-res.is-hidden .np-t { color: var(--jdr-hidden); }
+.np-res.is-hidden .np-ic { opacity: .5; }
+
+/* -------------------------------------------------------------- visionneuse */
+.application.np-viewer .window-content { padding: 0; overflow: hidden; }
+.np-view { display: flex; flex-direction: column; height: 100%; }
+.np-bar { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid var(--jdr-rule); }
+.np-bar-icon { font-size: 20px; }
+.np-bar-icon:empty { display: none; }
+.np-bar-text { flex: 1; min-width: 0; }
+.np-bar-title { font: 700 17px/1.2 var(--jdr-display); color: var(--jdr-ink); }
+.np-bar-path { font-size: 12px; color: var(--jdr-ink-soft); }
+.np-bar [hidden] { display: none; }
+/* Le premier chargement d'une page Notion prend plusieurs secondes : le message est sous le cadre, encore transparent,
+   et disparaît quand Notion peint sa page. */
+.np-view .np-frame { flex: 1; position: relative; background: var(--jdr-vellum); }
+.np-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.np-loading {
+  position: absolute; inset: 0; display: grid; place-content: center; gap: 6px;
+  color: var(--jdr-ink-soft, #888); font-size: 13.5px; text-align: center;
+}
+
+/* Page de journal (lecture dans le journal, hors visionneuse) : la partie « root » remplace notre div, d'où le sélecteur sur l'article de Foundry. */
+.journal-entry-page .np-frame { position: relative; height: max(420px, 72vh); border: 1px solid var(--color-border, #999); border-radius: 6px; overflow: hidden; }
+.journal-entry-page .np-emoji { margin-right: 4px; }
+.journal-entry-page .np-open { margin: 6px 0 0; text-align: right; font-size: 12.5px; }
+
+/* --------------------------------------------------------------- import */
+.application.np-import .window-content { padding: 10px; }
+.np-imp { display: flex; flex-direction: column; gap: 10px; }
+.notion-pages .np-card {
+  padding: 10px 12px; border: 1px solid var(--jdr-card-rule); border-radius: 8px; background: var(--jdr-vellum);
+  box-shadow: var(--jdr-lift);
+}
+.notion-pages .np-card h3 {
+  margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--jdr-rule);
+  font: 700 15px var(--jdr-display); color: var(--jdr-accent);
+}
+.notion-pages .np-card p { margin: 8px 0 0; }
+.np-file { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.np-file label.np-btn { cursor: pointer; }
+.np-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.np-stat { padding: 6px; border: 1px solid var(--jdr-rule); border-radius: 8px; background: var(--jdr-field); text-align: center; }
+.np-stat b { display: block; font: 800 28px/1.1 var(--jdr-display); color: var(--jdr-ink); }
+.np-stat span { font-size: 12px; color: var(--jdr-ink-soft); }
+.np-stat.add b { color: var(--jdr-ok); }
+.np-stat.mod b { color: var(--jdr-new); }
+.np-stat.del b { color: var(--jdr-del); }
+.np-parts { columns: 2; column-gap: 18px; }
+.np-parts label { display: flex; align-items: center; gap: 6px; padding: 2px 0; break-inside: avoid; font-size: 13.5px; }
+.np-parts label i { width: 14px; color: var(--jdr-gilt); font-size: 11px; }
+.np-parts label span { flex: 1; }
+.np-parts label small { color: var(--jdr-ink-soft); }
+.np-parts label.is-off span { text-decoration: line-through; color: var(--jdr-ink-soft); }
+.np-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.notion-pages a[data-act] { color: var(--jdr-accent); cursor: pointer; text-decoration: underline; }
+
+/* ----------------------------------------------------------- collecteur */
+.np-coll p, .np-coll ol { margin: 0 0 10px; }
+.np-coll li { margin: 4px 0; }
+.np-center { text-align: center; }
+.np-bookmarklet {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border: 1px dashed var(--jdr-gilt);
+  border-radius: 99px; background: var(--jdr-chip); color: var(--jdr-ink); font: 700 14px var(--jdr-body);
+  text-decoration: none; cursor: grab;
+}
+.np-bookmarklet:hover { color: var(--jdr-accent); text-shadow: none; }
+
+/* --------------------------------------------------------- hors fenêtre */
+.np-ui { font-family: var(--jdr-body); }
+.np-pill {
+  position: fixed; z-index: 70; left: 330px; top: 12px; display: inline-flex; align-items: center; gap: 7px;
+  width: auto; height: 34px; min-height: 0 !important; margin: 0; padding: 0 13px 0 11px;
+  border: 1px solid var(--jdr-gilt); border-radius: 99px; background: var(--jdr-grain), var(--jdr-vellum);
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, .65), var(--jdr-lift); color: var(--jdr-ink);
+  font: 700 14px var(--jdr-display); cursor: grab; user-select: none; touch-action: none;
+  /* Foundry anime ses boutons : sans ça, la pastille suivait la souris avec un temps de retard. */
+  transition: none !important;
+}
+.np-pill:hover { color: var(--jdr-accent); background: var(--jdr-grain), var(--jdr-vellum); box-shadow: 0 4px 14px -4px rgba(0, 0, 0, .65), var(--jdr-lift); }
+.np-pill:focus-visible { outline: 2px solid var(--jdr-gilt); outline-offset: 2px; }
+.np-pill.is-dragging { cursor: grabbing; opacity: .9; }
+.np-pill[hidden] { display: none; }
+
+.np-menu {
+  position: fixed; z-index: calc(var(--z-index-tooltip, 9999) + 1); display: flex; flex-direction: column; min-width: 230px;
+  padding: 4px; border: 1px solid var(--jdr-gilt); border-radius: 8px; background: var(--jdr-vellum);
+  box-shadow: 0 8px 22px -8px var(--jdr-shadow);
+}
+.np-menu button {
+  display: flex; align-items: center; gap: 8px; height: 30px; min-height: 0; padding: 0 10px; border: 0; border-radius: 6px;
+  background: none; color: var(--jdr-text); font: 500 13.5px var(--jdr-body); text-align: left; cursor: pointer;
+}
+.np-menu button:hover { background: var(--jdr-hover); color: var(--jdr-text-hover); box-shadow: none; }
+.np-menu button i { width: 16px; color: var(--jdr-gilt); }
+.np-menu hr { width: auto; margin: 3px 6px; border: 0; border-top: 1px solid var(--jdr-rule); }
+
+.np-tip {
+  position: fixed; z-index: var(--z-index-tooltip, 9999); width: 270px; padding: 8px 10px; pointer-events: none;
+  border: 1px solid var(--jdr-gilt); border-radius: 8px; background: var(--jdr-vellum);
+  box-shadow: 0 8px 22px -8px rgba(0, 0, 0, .8); font-size: 12.5px; color: var(--jdr-ink-soft);
+}
+.np-tip b { display: block; font: 700 15px var(--jdr-display); color: var(--jdr-ink); }
+.np-tip-c { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.np-tip-x { display: block; margin-top: 2px; }
+.np-tip-k { display: block; margin-top: 4px; font-size: 11.5px; }
