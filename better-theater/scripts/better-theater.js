@@ -1039,7 +1039,7 @@ const Panel = {
 /* ------------------------------------------------------------- bulles */
 
 // Foundry v14 envoie par défaut en mode « Public », classé hors personnage et sans orateur : c'est pourtant ce que
-// les joueurs tapent pour faire parler leur personnage (choix de Théo : ces lignes font des bulles). Chez l'auteur,
+// les joueurs tapent pour faire parler leur personnage (choix de l'auteur : ces lignes font des bulles). Chez l'auteur,
 // avant l'envoi, on retient donc le personnage qui parle (jeton sélectionné, sinon personnage attitré). /ooc n'en
 // fait pas : c'est le seul vrai hors-personnage.
 function onChatInput(chat, text, chatData) {
