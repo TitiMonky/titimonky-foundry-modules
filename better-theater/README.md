@@ -92,7 +92,10 @@ Both can be changed in **Configure Controls**.
 
 ## Compatibility
 
-Foundry VTT v13 and v14. Works with any game system; no other module needed.
+Foundry VTT v12, v13 and v14. Works with any game system; no other module needed.
+
+On v12, the 🎭 button sits in the chat controls of the chat tab (v12 has no floating chat: open the chat tab to
+reach it; Alt+H and Alt+L work everywhere).
 
 ## License
 

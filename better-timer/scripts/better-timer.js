@@ -252,6 +252,8 @@ function ensureRoot(id) {
     el = document.createElement("section");
     el.id = id;
     el.className = "bt-ui";
+    // Foundry v12 : la barre des scènes occupe le haut de l'écran, l'affichage des joueurs part plus bas (CSS).
+    if ((game.release?.generation ?? 14) < 13) el.classList.add("bt-v12");
     el.hidden = true;
     document.body.append(el);
   }
@@ -491,6 +493,18 @@ Hooks.once("init", () => {
 });
 
 Hooks.on("getSceneControlButtons", controls => {
+  // Foundry v12 : liste de contrôles, outils en tableau, clic par onClick (v13 et + : objets, onChange).
+  if (Array.isArray(controls)) {
+    controls.find(c => c.name === "notes")?.tools.push({
+      name: ID,
+      title: "Better Timer",
+      icon: "fa-solid fa-hourglass-half",
+      button: true,
+      visible: game.user.isGM,
+      onClick: () => openLauncher()
+    });
+    return;
+  }
   const notes = controls.notes;
   if (!notes) return;
   notes.tools[ID] = {

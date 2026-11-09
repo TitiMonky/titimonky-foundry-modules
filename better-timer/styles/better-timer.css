@@ -130,6 +130,8 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer {
   gap: 8px;
   cursor: grab;
 }
+/* Foundry v12 : sous la barre des scènes (en haut de l'écran avant v13). */
+#bt-display.bt-v12 { top: 64px; }
 #bt-display .bt-card {
   min-width: 170px;
   max-width: 280px;

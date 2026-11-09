@@ -23,6 +23,10 @@ const isLeadGM = () => !!game.users.activeGM?.isSelf;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+// Foundry v12 : interface d'avant la refonte de v13 (outils de scène, chat, liste des joueurs, menus en jQuery).
+// Lu à l'appel : game.release n'existe pas encore quand le script est chargé.
+const isV12 = () => (game.release?.generation ?? 14) < 13;
+
 // Textes affichés : lang/fr.json et lang/en.json (anglais pour les autres langues de Foundry).
 const t = (key, data) => (data ? game.i18n.format(`BTHEATER.${key}`, data) : game.i18n.localize(`BTHEATER.${key}`));
 
@@ -103,7 +107,12 @@ const ordinal = n => plural("Ordinal", n, {}, "ordinal");
 
 function handKey() {
   const binding = game.keybindings.get(ID, "hand")?.[0];
-  return binding ? foundry.applications.sidebar.apps.ControlsConfig.humanizeBinding(binding) : "";
+  if (!binding) return "";
+  const Config = foundry.applications.sidebar?.apps?.ControlsConfig;
+  if (Config) return Config.humanizeBinding(binding);
+  // v12
+  return globalThis.KeybindingsConfig?._humanizeBinding?.(binding)
+    ?? [...binding.modifiers, binding.key.replace(/^Key|^Digit/, "")].join(" + ");
 }
 
 // Lève ou baisse ma main (raccourci, menu du portrait).
@@ -291,15 +300,17 @@ const isStaged = actor => !!actor && readStage().entries.some(e => e.actorId ===
 const toggleActor = actor => request(isStaged(actor) ? "removeActor" : "addActor", { actorId: actor.id });
 
 function pickImage() {
-  const FP = foundry.applications.apps.FilePicker.implementation;
-  new FP({
+  const FP = foundry.applications.apps?.FilePicker?.implementation ?? FilePicker;   // v12 : FilePicker global (Application V1)
+  const picker = new FP({
     type: "image",
     callback: path => {
       const file = decodeURIComponent(path.split("/").pop() ?? "").replace(/\.[a-z0-9]+$/i, "");
       const name = file.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
       request("addImage", { img: path, name: name ? name[0].toUpperCase() + name.slice(1) : "" });
     }
-  }).render({ force: true });
+  });
+  if (isV12()) picker.render(true);
+  else picker.render({ force: true });
 }
 
 async function promptRename(entry) {
@@ -359,7 +370,7 @@ function visibleRect(el) {
 // joueurs, saisie du chat quand la barre latérale est repliée.
 function measure(origin) {
   const W = window.innerWidth, H = window.innerHeight;
-  const ctrl = visibleRect(document.getElementById("scene-controls"));
+  const ctrl = visibleRect(document.getElementById("scene-controls") ?? document.getElementById("controls"));   // v12 : #controls
   const side = visibleRect(document.getElementById("sidebar"));
   const area = {
     x0: (ctrl ? ctrl.right : 0) + 10 - origin.left,
@@ -794,6 +805,7 @@ function injectControls() {
   if (!group) {
     group = document.createElement("div");
     group.className = "bt-controls";
+    if (isV12()) group.classList.add("bt-v12");   // pas de style .ui-control avant v13 : le nôtre (CSS)
     group.innerHTML = `<button type="button" class="ui-control icon fa-solid fa-masks-theater" data-bt="menu" aria-expanded="false"></button>`;
     const button = group.firstElementChild;
     button.addEventListener("click", () => Panel.toggle(button));
@@ -801,7 +813,7 @@ function injectControls() {
     button.addEventListener("dragover", event => event.preventDefault());
     button.addEventListener("drop", event => {
       event.preventDefault();
-      const data = foundry.applications.ux.TextEditor.implementation.getDragEventData(event);
+      const data = (foundry.applications.ux?.TextEditor?.implementation ?? TextEditor).getDragEventData(event);   // v12 : TextEditor global
       if (data?.type !== "Actor") return;
       const actor = fromUuidSync(data.uuid);
       if (!actor?.isOwner) return void ui.notifications.warn(t("Notify.NotOwner"));
@@ -1155,6 +1167,8 @@ Hooks.once("ready", () => {
 });
 
 Hooks.on("renderChatInput", () => injectControls());
+// v12 : pas de hook renderChatInput, la saisie fait partie de l'onglet du chat.
+Hooks.on("renderChatLog", () => { if (isV12()) injectControls(); });
 Hooks.on("collapseSidebar", () => {
   Panel.close();
   setTimeout(() => Stage.render(), 260);
@@ -1164,6 +1178,7 @@ Hooks.on("clientSettingChanged", key => { if (key === "core.performanceMode") St
 Hooks.on("chatMessage", onChatInput);
 Hooks.on("createChatMessage", onChatMessage);
 Hooks.on("renderPlayers", () => decoratePlayers());
+Hooks.on("renderPlayerList", () => decoratePlayers());   // v12
 // Un joueur qui part baisse sa main.
 Hooks.on("userConnected", (user, active) => {
   if (!active && isLeadGM() && handOf(user.id)) run("lowerHand", { userId: user.id }, game.user);
@@ -1179,6 +1194,8 @@ Hooks.on("getHeaderControlsDocumentSheetV2", (app, controls) => {
   const actor = app.document;
   if (actor?.documentName !== "Actor" || !actor.isOwner) return;
   const staged = isStaged(actor);
+  // v12 : un bouton d'en-tête n'a pas de onClick, il appelle l'action du même nom de la fenêtre.
+  if (isV12()) try { app.options.actions.betterTheater ??= () => toggleActor(actor); } catch {}
   controls.unshift({
     action: "betterTheater",
     icon: staged ? "fa-solid fa-mask" : "fa-solid fa-masks-theater",
@@ -1215,6 +1232,26 @@ Hooks.on("getActorContextOptions", (app, options) => {
   });
 });
 
+// v12 : même menu, ancien format (name / condition / callback, icône en HTML, ligne en jQuery, data-document-id).
+Hooks.on("getActorDirectoryEntryContext", (_html, options) => {
+  if (!isV12()) return;
+  const actorOfLi = li => {
+    const el = li?.[0] ?? li;
+    return game.actors.get(el?.dataset?.documentId ?? el?.dataset?.entryId);
+  };
+  options.push({
+    name: t("Add"),
+    icon: `<i class="fa-solid fa-masks-theater"></i>`,
+    condition: li => { const a = actorOfLi(li); return !!a?.isOwner && !isStaged(a); },
+    callback: li => request("addActor", { actorId: actorOfLi(li)?.id })
+  }, {
+    name: t("Remove"),
+    icon: `<i class="fa-solid fa-mask"></i>`,
+    condition: li => { const a = actorOfLi(li); return !!a?.isOwner && isStaged(a); },
+    callback: li => request("removeActor", { actorId: actorOfLi(li)?.id })
+  });
+});
+
 // HUD du jeton : bouton dans la colonne de droite.
 Hooks.on("renderTokenHUD", (hud, html) => {
   const actor = hud.object?.actor;
@@ -1223,8 +1260,10 @@ Hooks.on("renderTokenHUD", (hud, html) => {
   const column = root?.querySelector(".col.right");
   if (!column) return;
   const staged = isStaged(actor);
-  const button = document.createElement("button");
-  button.type = "button";
+  // v12 : les icônes du HUD sont des <div> (un <button> y prendrait le style des boutons de Foundry).
+  const v12 = isV12();
+  const button = document.createElement(v12 ? "div" : "button");
+  if (!v12) button.type = "button";
   button.classList.add("control-icon", "bt-hud-button");
   if (staged) button.classList.add("active");
   button.dataset.tooltip = t(staged ? "Remove" : "Add");
@@ -1232,7 +1271,8 @@ Hooks.on("renderTokenHUD", (hud, html) => {
   button.addEventListener("click", event => {
     event.preventDefault();
     toggleActor(actor);
-    hud.close();
+    if (v12 && hud.clear) hud.clear();   // v12 : le HUD se masque par clear()
+    else hud.close();
   });
   column.append(button);
 });

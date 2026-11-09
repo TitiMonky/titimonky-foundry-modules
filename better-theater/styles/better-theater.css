@@ -268,6 +268,26 @@
   background: #e2bb68;
   box-shadow: 0 0 0 1.5px rgba(10, 12, 20, .9);
 }
+/* Foundry v12 : pas de bouton .ui-control, le chat est une rangée flexrow (qui étirerait le groupe). */
+#chat-controls .bt-controls.bt-v12 { flex: none; align-items: center; }
+#chat-controls .bt-controls.bt-v12 [data-bt] {
+  width: 26px;
+  height: 26px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+#chat-controls .bt-controls.bt-v12 [data-bt]:hover { color: var(--bt-gold, #e2bb68); text-shadow: 0 0 6px rgba(226, 187, 104, .6); }
+#chat-controls .bt-controls.bt-v12 [data-bt].bt-alert::after { top: 1px; right: 1px; }
 /* Chez le MJ : nombre de mains levées. */
 #chat-controls .bt-controls [data-bt] .bt-count {
   position: absolute;
