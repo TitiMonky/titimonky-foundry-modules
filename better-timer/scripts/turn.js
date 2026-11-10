@@ -24,6 +24,7 @@ const WARN_SEC = 30, DANGER_SEC = 10;       // orange sous 30 s, rouge sous 10 s
 const FOCUS_SCALE = 1;                      // zoom minimal de la caméra sur le jeton (on ne dézoome jamais)
 const PAN_MS = 800, HOLD_MS = 2900, FX_MS = 3900; // 3,9 s = durée de l'animation NEXT TURN
 const ANIM_RATIO = 270 / 640;               // hauteur / largeur de next-turn.webm
+const AUTO_SKIP_MS = 3000;                  // passage automatique : 3 s après zéro (son de fin, « Temps écoulé ! »)
 
 // Safari (et les navigateurs d'iPhone / iPad) ne gère pas la transparence des WebM : WebP animé à la place.
 const WEBM_ALPHA = !(/AppleWebKit/.test(navigator.userAgent) && !/Chrome\/|Chromium\//.test(navigator.userAgent));
@@ -34,7 +35,7 @@ const lastDuration = () => clamp(Number(game.settings.get(MOD, "turnDuration")) 
 
 function readTurn(combat) {
   const f = combat?.getFlag(MOD, "turn") ?? {};
-  return { enabled: !!f.enabled, duration: f.duration ?? lastDuration(), timer: f.timer ?? null };
+  return { enabled: !!f.enabled, duration: f.duration ?? lastDuration(), autoSkip: !!f.autoSkip, timer: f.timer ?? null };
 }
 
 // Clé du tour en cours : un nouveau round ou un autre combattant = un nouveau tour (le minuteur repart au maximum).
@@ -99,6 +100,14 @@ function setEnabled(combat, enabled) {
   return writeTurn(combat, s => {
     s.enabled = !!enabled;
     s.timer = isTimed(combat, s) ? freshTimer(combat, s) : null;
+  });
+}
+
+// Passage automatique au tour suivant quand le temps est écoulé (facultatif, par combat).
+function setAutoSkip(combat, autoSkip) {
+  return writeTurn(combat, s => {
+    if (s.autoSkip === !!autoSkip) return false;
+    s.autoSkip = !!autoSkip;
   });
 }
 
@@ -169,6 +178,22 @@ function finishDue() {
     if (!t || t.finishedAt || elapsedOf(t) < t.duration) return false;
     Object.assign(t, { elapsed: t.duration, startedAt: null, finishedAt: now() });
   }).finally(() => { finishing = false; });
+}
+
+// Passage automatique : 3 s après zéro, si l'option est cochée pour ce combat. La pause du jeu le retient (il part à
+// la reprise) ; « +1 min » pendant ces 3 s l'annule (le tour repart, et repassera à son nouveau zéro).
+const autoSkipped = new Set();
+function autoSkipDue() {
+  if (!isLeadGM() || game.paused) return;
+  for (const combat of game.combats) {
+    const s = readTurn(combat);
+    const t = s.timer;
+    if (!s.autoSkip || !t?.finishedAt || t.key !== keyOf(combat) || now() - t.finishedAt < AUTO_SKIP_MS) continue;
+    const once = `${combat.id}:${t.key}:${t.finishedAt}`;
+    if (autoSkipped.has(once)) continue;
+    autoSkipped.add(once);
+    combat.nextTurn().catch(err => console.error(`${MOD} |`, err));
+  }
 }
 
 // La pause du jeu fige le minuteur de tour.
@@ -295,7 +320,7 @@ function updateBanner() {
   card.classList.toggle("is-danger", !over && sec <= DANGER_SEC);
   card.querySelector(".bt-time").textContent = formatTime(sec);
   card.querySelector(".bt-bar span").style.width = width;
-  card.querySelector(".bt-state").textContent = over ? "Temps écoulé !"
+  card.querySelector(".bt-state").textContent = over ? (readTurn(game.combat).autoSkip ? "Tour suivant…" : "Temps écoulé !")
     : t.paused ? "En pause"
     : t.pausedByGame ? "Jeu en pause" : "";
   const toggle = card.querySelector('[data-bt="toggle"]');
@@ -325,6 +350,10 @@ function configHTML(combat) {
         <button type="button" data-bt-turn="step" data-min="1" data-tooltip="Une minute de plus">+</button>
       </span>
     </div>
+    <button type="button" class="bt-turn-auto${s.autoSkip ? " is-active" : ""}" data-bt-turn="auto" aria-pressed="${s.autoSkip}"
+      data-tooltip="Le tour passe tout seul 3 s après la fin du temps">
+      <i class="fa-${s.autoSkip ? "solid fa-square-check" : "regular fa-square"}"></i><span>Passer le tour automatiquement à zéro</span>
+    </button>
   </div>`;
 }
 
@@ -350,6 +379,7 @@ function onRenderTracker(app, html) {
         if (b.dataset.btTurn === "toggle") setEnabled(combat, !s.enabled);
         else if (b.dataset.btTurn === "set") setDuration(combat, Number(b.dataset.min) * 60);
         else if (b.dataset.btTurn === "step") setDuration(combat, s.duration / 1000 + Number(b.dataset.min) * 60);
+        else if (b.dataset.btTurn === "auto") setAutoSkip(combat, !s.autoSkip);
       });
     }
   }
@@ -472,6 +502,7 @@ export const turnApi = {
   setDuration: (seconds, combat = game.combat) => setDuration(combat, seconds),
   addTime: (seconds, combat = game.combat) => addTurnTime(combat?.id, seconds),
   pause: (combat = game.combat) => setPaused(combat, true),
+  autoSkip: (enabled = true, combat = game.combat) => setAutoSkip(combat, enabled),
   resume: (combat = game.combat) => setPaused(combat, false)
 };
 export { addTurnTime };
@@ -541,6 +572,7 @@ Hooks.once("ready", () => {
   syncGamePause();
   setInterval(() => {
     finishDue();
+    autoSkipDue();
     ensureTurn(game.combat);
     updateBanner();
   }, 200);
