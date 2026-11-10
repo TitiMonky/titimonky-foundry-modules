@@ -2,6 +2,9 @@
 // L'état de chaque minuteur est stocké dans un réglage du monde (écrit par le MJ uniquement) sous forme d'horodatages
 // (heure du serveur) : chaque client calcule le temps restant lui-même, rien ne transite chaque seconde, et un
 // rechargement de page (F5) ne coupe rien. Joueurs : affichage déplaçable (haut gauche). MJ : widget (bas gauche).
+// Le minuteur de tour (onglet Combat) est dans turn.js : il réutilise les fonctions exportées ici.
+
+import { addTurnTime, turnApi } from "./turn.js";
 
 const ID = "better-timer";
 const AUDIO = `modules/${ID}/audio`;
@@ -295,7 +298,8 @@ function rowHTML(t) {
 function render() {
   const timers = sortedTimers();
   for (const id of lastSeen.keys()) if (!timers.some(t => t.id === id)) lastSeen.delete(id);
-  if (!timers.some(t => t.id === document.getElementById("bt-addmenu")?.dataset.timer)) closeAddMenu();
+  const menuFor = document.getElementById("bt-addmenu")?.dataset.timer;
+  if (menuFor && !menuFor.startsWith("turn:") && !timers.some(t => t.id === menuFor)) closeAddMenu();
   if (game.user.isGM) {
     const root = ensureRoot("bt-widget");
     root.hidden = !timers.length;
@@ -478,6 +482,13 @@ function openLauncher() {
   else new TimerLauncher().render({ force: true });
 }
 
+/* ------------------------------------------------ partagé avec turn.js */
+
+export {
+  ID, AUDIO, now, clamp, esc, isRunning, elapsedOf, sync, formatTime, sessionStart, needsRebase, rebase,
+  playSound, ensureRoot, place, makeDraggable, openAddMenu, closeAddMenu, isLeadGM
+};
+
 /* ------------------------------------------------------------------ hooks */
 
 Hooks.once("init", () => {
@@ -521,7 +532,7 @@ Hooks.on("getSceneControlButtons", controls => {
 Hooks.on("pauseGame", paused => syncGamePause(paused));
 
 Hooks.once("ready", () => {
-  game.modules.get(ID).api = { start, pause, resume, stop, addTime, open: openLauncher };
+  game.modules.get(ID).api = { start, pause, resume, stop, addTime, open: openLauncher, turn: turnApi };
   foundry.audio.AudioHelper.preloadSound(`${AUDIO}/end.wav`);
 
   const display = ensureRoot("bt-display");
@@ -541,7 +552,10 @@ Hooks.once("ready", () => {
   addMenu.addEventListener("click", event => {
     const min = Number(event.target.closest("[data-min]")?.dataset.min);
     if (!min) return;
-    addTime(addMenu.dataset.timer, min * 60);
+    // « turn:<id du combat> » = menu ouvert depuis le bandeau du minuteur de tour.
+    const target = addMenu.dataset.timer ?? "";
+    if (target.startsWith("turn:")) addTurnTime(target.slice(5), min * 60);
+    else addTime(target, min * 60);
     closeAddMenu();
   });
   // Un clic ailleurs (y compris pour déplacer le widget) ou Échap ferme le menu.

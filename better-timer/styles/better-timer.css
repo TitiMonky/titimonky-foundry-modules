@@ -2,6 +2,8 @@
    Better Timer : DA des Légendes de Meyiv (même palette que fiche-meyiv).
    #bt-display : minuteurs des joueurs (haut gauche, déplaçable).
    #bt-widget  : widget du MJ (bas gauche, déplaçable par son en-tête).
+   #bt-turn    : bandeau du minuteur de tour (bas centre, déplaçable) ; .bt-turn-config : réglages dans l'onglet Combat.
+   #bt-turnfx  : mise en scène du début de tour (calque juste au-dessus de la carte, sous l'interface).
    ===================================================================== */
 @import url("https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Alegreya+Sans:wght@400;500;700;800&display=swap");
 
@@ -9,6 +11,7 @@
    ou « Suivre Foundry » / module absent quand Foundry est en thème sombre (interface pour les minuteurs,
    fenêtres pour la fenêtre de lancement). */
 .bt-ui,
+.bt-turn-config,
 .application.better-timer {
   --jdr-vellum: #f6f1e6;
   --jdr-paper-2: #f1eadb;
@@ -36,6 +39,10 @@
 body.jdr-dark .bt-ui,
 body.jdr-dark .application.better-timer,
 body:not(.jdr-light):not(.jdr-dark):has(#interface.theme-dark) .bt-ui,
+body.jdr-dark .bt-turn-config,
+body:not(.jdr-light):not(.jdr-dark) .theme-dark .bt-turn-config,
+body:not(.jdr-light):not(.jdr-dark).theme-dark .bt-turn-config,
+.bt-turn-config.bt-v12,
 body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer {
   --jdr-vellum: #1b1b1e;
   --jdr-paper-2: #18181b;
@@ -358,3 +365,204 @@ body:not(.jdr-light):not(.jdr-dark).theme-dark .application.better-timer .window
   border: 1px solid var(--jdr-btn);
 }
 .application.better-timer .form-footer button[type="submit"]:hover { background: var(--jdr-btn-hover); }
+
+/* ======================================================= minuteur de tour */
+
+/* Bandeau (tout le monde) : portrait, « Tour de X », temps, barre, « Ensuite : Y » ; boutons du MJ à droite. */
+#bt-turn { cursor: grab; }
+#bt-turn .bt-turn-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 300px;
+  max-width: 440px;
+  padding: 8px 12px 8px 8px;
+  background: var(--jdr-grain-card), linear-gradient(180deg, var(--jdr-vellum), var(--jdr-paper-2));
+  border: 1px solid var(--jdr-gilt);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px var(--jdr-shadow), inset 0 0 0 3px var(--jdr-vellum), inset 0 0 0 4px var(--jdr-gilt-soft);
+}
+#bt-turn .bt-turn-card.is-done { border-color: var(--jdr-hp); }
+#bt-turn .bt-turn-img {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  object-fit: cover;
+  border: 1px solid var(--jdr-gilt);
+  border-radius: 50%;
+  background: var(--jdr-chip);
+  pointer-events: none;
+}
+#bt-turn .bt-turn-main { flex: 1; min-width: 0; }
+#bt-turn .bt-turn-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+#bt-turn .bt-label { font-size: 14px; }
+#bt-turn .bt-time { font-size: 26px; }
+#bt-turn .bt-bar { margin: 3px 0 4px; }
+#bt-turn .bt-turn-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-height: 14px; }
+#bt-turn .bt-turn-next {
+  min-width: 0;
+  font-size: 12px;
+  color: var(--jdr-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#bt-turn .bt-turn-actions { flex: none; display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+#bt-turn .bt-turn-tools { display: flex; gap: 4px; justify-content: flex-end; }
+#bt-turn button {
+  height: 28px;
+  min-width: 28px;
+  min-height: 0 !important;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--jdr-bordeaux);
+  background: var(--jdr-field);
+  border: 1px solid var(--jdr-rule);
+  border-radius: 7px;
+  box-shadow: none;
+  cursor: pointer;
+}
+#bt-turn button:hover { color: var(--jdr-btn-ink); background: var(--jdr-btn); border-color: var(--jdr-btn); }
+#bt-turn button:disabled { opacity: .35; pointer-events: none; }
+/* « Passer le tour » (MJ) : seulement quand le temps est écoulé, à la place de ± et pause. */
+#bt-turn .bt-turn-skip {
+  display: none;
+  padding: 0 10px;
+  gap: 5px;
+  grid-auto-flow: column;
+  font-family: var(--jdr-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  color: var(--jdr-btn-ink);
+  background: var(--jdr-btn);
+  border-color: var(--jdr-btn);
+}
+#bt-turn .bt-turn-skip:hover { background: var(--jdr-btn-hover); border-color: var(--jdr-btn-hover); }
+#bt-turn .is-done .bt-turn-skip { display: grid; }
+#bt-turn .is-done .bt-turn-tools { display: none; }
+
+/* Onglet Combat : barre du temps restant sous le combattant actif (tout le monde).
+   Couleurs fixes : la liste suit le thème de Foundry, pas la palette du module. */
+li.combatant.bt-has-turn { position: relative; }
+.bt-turn-track {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 1px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(127, 127, 127, .25);
+  overflow: hidden;
+  pointer-events: none;
+}
+.bt-turn-track span { display: block; height: 100%; background: #cfa95e; transition: width .2s linear; }
+.bt-turn-track.is-warn span { background: #ffa955; }
+.bt-turn-track.is-danger span { background: #ff7070; }
+
+/* Onglet Combat : réglages (MJ). */
+.bt-turn-config {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 2px;
+  padding: 6px;
+  font-family: var(--jdr-body);
+  color: var(--jdr-ink);
+  background: var(--jdr-vellum);
+  border: 1px solid var(--jdr-rule);
+  border-radius: 8px;
+}
+.bt-turn-config button {
+  min-height: 0 !important;
+  margin: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+.bt-turn-config .bt-turn-switch {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  height: 28px;
+  padding: 0 9px;
+  font-family: var(--jdr-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--jdr-bordeaux);
+  background: var(--jdr-field);
+  border: 1px solid var(--jdr-rule);
+  border-radius: 6px;
+}
+.bt-turn-config .bt-turn-switch span { flex: 1; text-align: left; }
+.bt-turn-config .bt-turn-flag { font-size: 16px; color: var(--jdr-ink-soft); }
+.bt-turn-config.is-on .bt-turn-switch { color: var(--jdr-btn-ink); background: var(--jdr-btn); border-color: var(--jdr-btn); }
+.bt-turn-config.is-on .bt-turn-flag { color: inherit; }
+.bt-turn-config .bt-turn-durations { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.bt-turn-config:not(.is-on) .bt-turn-durations { opacity: .55; }
+.bt-turn-config .bt-turn-durations > button,
+.bt-turn-config .bt-turn-step button {
+  height: 24px;
+  min-width: 0;
+  padding: 0 8px;
+  font-family: var(--jdr-body);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--jdr-bordeaux);
+  background: var(--jdr-chip);
+  border: 1px solid var(--jdr-rule);
+  border-radius: 12px;
+}
+.bt-turn-config .bt-turn-durations > button.is-active { color: var(--jdr-btn-ink); background: var(--jdr-btn); border-color: var(--jdr-btn); }
+.bt-turn-config .bt-turn-durations button:hover { color: var(--jdr-btn-ink); background: var(--jdr-btn-hover); border-color: var(--jdr-btn-hover); }
+.bt-turn-config.is-on .bt-turn-switch:hover { background: var(--jdr-btn-hover); border-color: var(--jdr-btn-hover); }
+.bt-turn-config:not(.is-on) .bt-turn-switch:hover { border-color: var(--jdr-bordeaux); }
+.bt-turn-config .bt-turn-step { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.bt-turn-config .bt-turn-step span { min-width: 40px; font-size: 12.5px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.bt-turn-config .bt-turn-step button { width: 24px; padding: 0; }
+
+/* Mise en scène du début de tour : halo sombre, bandes noires, animation « NEXT TURN » au-dessus du jeton.
+   Rien que de l'opacité et des transformations (la carte graphique s'en charge) ; caché hors de la mise en scène.
+   Placé juste après le plateau (#board, z 0) : au-dessus de la carte, sous toute l'interface. */
+#bt-turnfx {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-canvas, 0);
+  pointer-events: none;
+  overflow: hidden;
+}
+#bt-turnfx:not(.is-active) { visibility: hidden; }
+#bt-turnfx .bt-turnfx-vignette {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, transparent var(--bt-hole, 120px), rgba(0, 0, 0, .6) calc(var(--bt-hole, 120px) * 2.8));
+  transition: opacity .8s ease;
+}
+#bt-turnfx .bt-turnfx-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 8vh;
+  background: #000;
+  transition: transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+#bt-turnfx .bt-turnfx-band.is-top { top: 0; transform: translateY(-100%); }
+#bt-turnfx .bt-turnfx-band.is-bottom { bottom: 0; transform: translateY(100%); }
+#bt-turnfx.is-on .bt-turnfx-vignette { opacity: 1; transition-duration: .5s; }
+#bt-turnfx.is-on .bt-turnfx-band { transform: none; transition-duration: .5s; }
+#bt-turnfx .bt-turnfx-anim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  will-change: transform;
+}
+#bt-turnfx .bt-turnfx-anim.is-playing { opacity: 1; }
