@@ -43,7 +43,9 @@ function readTurn(combat) {
 const keyOf = combat => (combat?.started && combat.combatant) ? `${combat.round}:${combat.combatant.id}` : null;
 
 // Tour chronométré : minuteur activé et combattant qui appartient à un joueur (les PNJ n'ont pas de minuteur).
-const isTimed = (combat, s = readTurn(combat)) => !!(s.enabled && keyOf(combat) && combat.combatant.hasPlayerOwner);
+// Lu sur l'acteur (même réponse dans toutes les versions de Foundry), le combattant en secours (jeton sans acteur).
+const playerOwned = c => !!(c?.actor?.hasPlayerOwner ?? c?.hasPlayerOwner);
+const isTimed = (combat, s = readTurn(combat)) => !!(s.enabled && keyOf(combat) && playerOwned(combat.combatant));
 
 function freshTimer(combat, s) {
   return sync({

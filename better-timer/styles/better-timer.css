@@ -585,3 +585,16 @@ li.combatant.bt-has-turn { position: relative; }
   will-change: transform;
 }
 #bt-turnfx .bt-turnfx-anim.is-playing { opacity: 1; }
+
+/* Foundry v12 : tout <button> y est en pleine largeur (width: 100%, line-height 28 px, bordure « groove »).
+   On rend leur taille à nos boutons du minuteur de tour (onglet Combat et bandeau). */
+.bt-turn-config button,
+#bt-turn button {
+  width: auto;
+  flex: none;
+  line-height: 1;
+}
+.bt-turn-config .bt-turn-switch { width: 100%; }
+.bt-turn-config .bt-turn-step button { width: 24px; }
+.bt-turn-config button > i,
+#bt-turn button > i { margin-right: 0; }
